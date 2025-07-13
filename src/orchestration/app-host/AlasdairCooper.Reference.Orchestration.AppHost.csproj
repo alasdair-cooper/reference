@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsAspireHost>true</IsAspireHost>
+        <UserSecretsId>af280bb1-ffcf-4454-87b8-0ed440955fec</UserSecretsId>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
+        <PackageReference Include="Aspire4Wasm.AppHost" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference
+            Include="..\..\orchestration\shared\AlasdairCooper.Reference.Orchestration.Shared.csproj"
+            IsAspireProjectResource="false" />
+        <ProjectReference Include="..\..\api\AlasdairCooper.Reference.Api.csproj" />
+        <ProjectReference
+            Include="..\..\internal-frontend\AlasdairCooper.Reference.InternalFrontend.csproj" />
+    </ItemGroup>
+
+</Project>
