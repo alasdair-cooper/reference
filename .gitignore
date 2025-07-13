@@ -3,3 +3,7 @@ artifacts
 
 # Rust
 target
+
+# IDEs
+.vs
+.idea
