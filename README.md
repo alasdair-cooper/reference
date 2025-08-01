@@ -1,6 +1,6 @@
 # Reference
 
-| This repo is just project templates at the moment, nothing useful has been added yet!
+> This repo is just project templates at the moment, nothing useful has been added yet!
 
 This is a project I am using to store various tricks, best practices and larger problem solutions that I find recurrently useful.
 
