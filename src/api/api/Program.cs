@@ -1,8 +1,11 @@
+using AlasdairCooper.Reference.Api.Data;
+using AlasdairCooper.Reference.Orchestration.Shared;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+builder.AddNpgsqlDbContext<ReferenceDbContext>(AspireConstants.Resources.Database);
 
 builder.Services.AddOpenApi();
 
