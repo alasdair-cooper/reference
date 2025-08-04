@@ -10,3 +10,4 @@ target
 # IDEs
 .vs
 .idea
+*.DotSettings.user
