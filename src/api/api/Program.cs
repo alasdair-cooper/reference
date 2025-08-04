@@ -43,5 +43,7 @@ app.MapMediaEndpoints();
 app.MapPromotionsEndpoints();
 
 app.UseCors();
+app.UseStatusCodePages();
+app.UseExceptionHandler();
 
 app.Run();
