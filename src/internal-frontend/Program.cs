@@ -7,7 +7,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddServiceDiscovery();
+builder.AddServiceDefaults();
 
 builder.Services.ConfigureHttpClientDefaults(x => x.AddServiceDiscovery());
 

@@ -1,4 +1,4 @@
-﻿namespace AlasdairCooper.Reference.Orchestration.Shared;
+﻿namespace AlasdairCooper.Reference.Orchestration.Shared.Orchestration;
 
 public class AspireConstants
 {

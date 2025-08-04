@@ -36,11 +36,8 @@ public class MigrationWorker(IServiceProvider serviceProvider, IHostApplicationL
 
         await strategy.ExecuteAsync(
             (dbContext, cancellationToken),
-            static async state =>
-            {
                 // Run migration in a transaction to avoid partial migration if it fails.
-                await state.dbContext.Database.MigrateAsync(state.cancellationToken);
-            });
+            static async state => await state.dbContext.Database.MigrateAsync(state.cancellationToken));
     }
 
     private static async Task SeedDataAsync(ReferenceDbContext dbContext, CancellationToken cancellationToken)
@@ -51,8 +48,8 @@ public class MigrationWorker(IServiceProvider serviceProvider, IHostApplicationL
             (dbContext, cancellationToken),
             static async state =>
             {
-                // Seed the database
                 await using var transaction = await state.dbContext.Database.BeginTransactionAsync(state.cancellationToken);
+                await state.dbContext.SeedDataAsync(state.cancellationToken);
                 await state.dbContext.SaveChangesAsync(state.cancellationToken);
                 await transaction.CommitAsync(state.cancellationToken);
             });

@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <Sdk Name="Aspire.AppHost.Sdk" Version="9.3.1" />
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.0" />
+    
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -11,16 +12,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.1" />
-        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.3.1" />
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.4.0" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.4.0" />
         <PackageReference Include="Aspire4Wasm.AppHost" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\AlasdairCooper.Reference.Api.Migrator\AlasdairCooper.Reference.Api.Migrator.csproj" />
-        <ProjectReference Include="..\..\orchestration\shared\AlasdairCooper.Reference.Orchestration.Shared.csproj" IsAspireProjectResource="false" />
-        <ProjectReference Include="..\..\api\AlasdairCooper.Reference.Api.csproj" />
+        <ProjectReference Include="..\..\api\api\AlasdairCooper.Reference.Api.csproj" />
+        <ProjectReference Include="..\..\api\migrator\AlasdairCooper.Reference.Api.Migrator.csproj" />
         <ProjectReference Include="..\..\internal-frontend\AlasdairCooper.Reference.InternalFrontend.csproj" />
+        <ProjectReference Include="..\..\orchestration\shared\AlasdairCooper.Reference.Orchestration.Shared.csproj" IsAspireProjectResource="false" />
     </ItemGroup>
 
 </Project>

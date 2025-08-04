@@ -23,6 +23,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlasdairCooper.Reference.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlasdairCooper.Reference.Api.Migrator", "src\api\migrator\AlasdairCooper.Reference.Api.Migrator.csproj", "{31F63DCC-D7E5-4ECA-9C4E-4288E3D55630}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "items", "items", "{D9FBEFDE-04FA-47C8-8DD4-430DD25C641A}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.build.props = Directory.build.props
+		Directory.build.targets = Directory.build.targets
+		global.json = global.json
+		nuget.config = nuget.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A031F3A9-762F-47E4-B357-AA369B7C4007}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,5 +139,8 @@ Global
 		{987ECCEB-760C-4D7B-82B5-A6C7720455BB} = {D82C56D6-B2CD-F611-9E31-04638F7EC30E}
 		{37688090-FF73-4786-B0CB-60621193B907} = {D82C56D6-B2CD-F611-9E31-04638F7EC30E}
 		{31F63DCC-D7E5-4ECA-9C4E-4288E3D55630} = {D82C56D6-B2CD-F611-9E31-04638F7EC30E}
+		{D82C56D6-B2CD-F611-9E31-04638F7EC30E} = {A031F3A9-762F-47E4-B357-AA369B7C4007}
+		{CE609670-85B9-0D16-FB54-ED063D5D8A6D} = {A031F3A9-762F-47E4-B357-AA369B7C4007}
+		{6769D8A8-7DDF-9F1A-6194-7060CBC2FEA6} = {A031F3A9-762F-47E4-B357-AA369B7C4007}
 	EndGlobalSection
 EndGlobal

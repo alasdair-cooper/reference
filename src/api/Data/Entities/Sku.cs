@@ -1,32 +1,22 @@
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using AlasdairCooper.Reference.Api.Data.Types;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using System.ComponentModel.DataAnnotations;
+using AlasdairCooper.Reference.Api.Data.Utilities;
+using AlasdairCooper.Reference.Orchestration.Shared.Common;
 
 namespace AlasdairCooper.Reference.Api.Data.Entities;
 
-public sealed class Sku(int id, string name, string description, Money price)
+public sealed class Sku(int id, string displayName, string[] keyPoints, string? description, Money suggestedPrice)
 {
-    public int Id { get; private set; } = id;
+    public int Id { get; init; } = id;
 
     [StringLength(100)]
-    public string Name { get; private set; } = name;
+    public string DisplayName { get; set; } = displayName;
 
-    [StringLength(300)]
-    public string Description { get; private set; } = description;
+    public string[] KeyPoints { get; set; } = keyPoints;
 
-    public Money Price { get; private set; } = price;
+    [StringLength(400)]
+    public string? Description { get; set; } = description;
 
-    // public List<Media> Media { get; private set; } = null!;
-}
+    public Money SuggestedPrice { get; init; } = suggestedPrice;
 
-public class SkuEntityTypeConfiguration : IEntityTypeConfiguration<Sku>
-{
-    public void Configure(EntityTypeBuilder<Sku> builder)
-    {
-    }
+    public List<Tag> Tags { get; init; } = null!;
 }

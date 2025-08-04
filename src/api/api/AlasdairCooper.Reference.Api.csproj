@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.1" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0-preview.5" />
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.4.0" />
+    <PackageReference Include="Aspire4Wasm.WebApi" Version="6.0.1" />
     <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.6.1" />
   </ItemGroup>
 
