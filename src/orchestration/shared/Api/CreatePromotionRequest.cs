@@ -6,4 +6,5 @@ public sealed record CreatePromotionRequest(
     string Description,
     DateTimeOffset StartDate,
     DateTimeOffset EndDate,
-    DiscountDetails[] Discounts);
+    DiscountDetails[] Discounts,
+    int[] MediaIds);

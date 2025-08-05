@@ -12,6 +12,7 @@ builder.AddServiceDefaults();
 builder.AddNpgsqlDbContext<ReferenceDbContext>(AspireConstants.Resources.Database);
 
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddDiscounts();
 builder.Services.AddMedia();

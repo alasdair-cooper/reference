@@ -1,0 +1,50 @@
+﻿@using AlasdairCooper.Reference.Orchestration.Shared.Api
+
+@page "/promotions"
+
+@code { public static string Url() => "/promotions"; }
+
+<PageTitle>Promotions</PageTitle>
+
+<h1>Promotions</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (_promotions == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Period</th>
+                <th>Media</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var promotion in _promotions)
+            {
+                <tr>
+                    <td>@promotion.DisplayName</td>
+                    <td>@promotion.StartDate - @promotion.EndDate</td>
+                    <td>@promotion.MediaUrls.Length</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private readonly ApiClient _client;
+    
+    private List<PromotionDto>? _promotions;
+
+    public Promotions(ApiClient client) => _client  = client;
+
+    protected override async Task OnInitializedAsync() => _promotions = await _client.ListPromotionsAsync();
+
+}

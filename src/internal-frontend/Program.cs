@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using AlasdairCooper.Reference.InternalFrontend;
+using AlasdairCooper.Reference.Orchestration.Shared.Api;
+using AlasdairCooper.Reference.Orchestration.Shared.Orchestration;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -11,6 +13,6 @@ builder.AddServiceDefaults();
 
 builder.Services.ConfigureHttpClientDefaults(x => x.AddServiceDiscovery());
 
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddHttpClient<ApiClient>(x => x.BaseAddress = new Uri($"https+http://{AspireConstants.Resources.Api}"));
 
 await builder.Build().RunAsync();
