@@ -1,5 +1,4 @@
 ﻿@using AlasdairCooper.Reference.Shared.Bcl
-@using Microsoft.JSInterop
 
 @foreach (var dialog in _dialogs)
 {
@@ -18,7 +17,7 @@
     public DialogRenderer(DialogService dialogService, IJSRuntime jsRuntime)
     {
         dialogService.DialogRenderer = this;
-        _module = new AsyncLazy<IJSObjectReference>(async () => await jsRuntime.InvokeAsync<IJSObjectReference>("import", $"./Dialog/{nameof(DialogRenderer)}.razor.js"));
+        _module = new AsyncLazy<IJSObjectReference>(async () => await jsRuntime.InvokeAsync<IJSObjectReference>("import", $"./_content/AlasdairCooper.Reference.Components/Dialog/{nameof(DialogRenderer)}.razor.js"));
     }
 
     public async Task<DialogResult<TResult?>> RenderDialogAsync<TDialog, TResult>(Action<TDialog> configureParams) where TDialog : DialogComponentBase<TResult>

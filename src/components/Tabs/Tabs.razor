@@ -1,0 +1,48 @@
+﻿<div>
+    @foreach (var (index, tab) in _tabs.Index())
+    {
+        var id = $"tab-header-{Guid.NewGuid()}";
+        <input
+            type="radio"
+            id="@id"
+            name="@_name"
+            value="@index"
+            checked="@(_selectedTabIndex == index)"
+            @onchange="@(() => ChangeTab(index))"
+            hidden>
+        <label for="@id">
+            @tab.HeaderContent
+        </label>
+    }
+</div>
+
+@_tabs.ElementAtOrDefault(_selectedTabIndex)?.ChildContent
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    private int _selectedTabIndex;
+    private readonly string _name = $"tabs-{Guid.NewGuid()}";
+    private readonly HashSet<Tab> _tabs = [];
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public void RegisterTab(Tab tab)
+    {
+        if (_tabs.Add(tab))
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void ChangeTab(int index)
+    {
+        _selectedTabIndex = index;
+        StateHasChanged();
+    }
+
+}
