@@ -1,4 +1,4 @@
-using AlasdairCooper.Reference.Orchestration.Shared.Orchestration;
+using AlasdairCooper.Reference.Shared.Orchestration;
 
 var builder = DistributedApplication.CreateBuilder(args);
 

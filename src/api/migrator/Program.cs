@@ -1,7 +1,7 @@
 using AlasdairCooper.Reference.Api.Data;
 using AlasdairCooper.Reference.Api.Migrator;
-using AlasdairCooper.Reference.Orchestration.Shared;
-using AlasdairCooper.Reference.Orchestration.Shared.Orchestration;
+using AlasdairCooper.Reference.Shared;
+using AlasdairCooper.Reference.Shared.Orchestration;
 
 var builder = Host.CreateApplicationBuilder(args);
 

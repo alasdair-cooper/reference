@@ -1,5 +1,5 @@
 ﻿using AlasdairCooper.Reference.Api.Data;
-using AlasdairCooper.Reference.Orchestration.Shared.Api;
+using AlasdairCooper.Reference.Shared.Api;
 
 namespace AlasdairCooper.Reference.Api.Features.Discounts;
 

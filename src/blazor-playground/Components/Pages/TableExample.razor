@@ -1,0 +1,134 @@
+﻿@using System.Diagnostics
+@using System.Text.Json
+@using AlasdairCooper.Reference.Components
+@using Bogus
+@using Bogus.DataSets
+
+@page "/table"
+
+<label for="sort-by">Sort by</label>
+
+<select
+    @bind:get="JsonSerializer.Serialize((_sortDirection, _sortBy), JsonSerializerOptions)"
+    @bind:set="x => (_sortDirection, _sortBy) = JsonSerializer.Deserialize<(SortDirection, UserSortableField)>(x, JsonSerializerOptions)"
+    id="sort-by">
+    @foreach (var value in Enum.GetValues<UserSortableField>().Select(IEnumerable<(SortDirection dir, UserSortableField field)> (x) => [(SortDirection.Ascending, x), (SortDirection.Descending, x)]).SelectMany(x => x))
+    {
+        <option value="@JsonSerializer.Serialize(value, JsonSerializerOptions)">
+            @value.field
+            @(value.dir switch
+            {
+                SortDirection.Ascending => new MarkupString("&ShortDownArrow;"),
+                SortDirection.Descending => new MarkupString("&ShortUpArrow;"),
+                _ => throw new ArgumentOutOfRangeException()
+            })
+        </option>
+    }
+</select>
+
+<Table
+    DataProvider="FetchDataAsync"
+    State="(_page, _pageSize, _sortDirection, _sortBy)"
+    @bind-Page="_page"
+    @bind-PageSize="_pageSize">
+    <IndexColumn />
+    <Column
+        Title="First Name"
+        Property="x => x.FirstName" />
+    <Column
+        Title="Last Name"
+        Property="x => x.LastName" />
+    <Column
+        Title="Age"
+        Property="x => x.Age" />
+    <Column
+        Title="Gender"
+        Property="x => x.Gender" />
+    <Column
+        Title="Email"
+        Property="x => x.Email" />
+</Table>
+
+<label for="page-size">Items per page</label>
+
+<select
+    @bind="_pageSize"
+    id="page-size">
+    <option value="10">10</option>
+    <option value="25">25</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+</select>
+
+@code {
+
+    private int _page = 1;
+    private int _pageSize = 10;
+    private SortDirection _sortDirection;
+    private UserSortableField _sortBy;
+
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new() { IncludeFields = true };
+
+    private static Task<(IEnumerable<User>, int)> FetchDataAsync((int page, int pageSize, SortDirection sortDirection, UserSortableField sortBy) state)
+    {
+        var users =
+            new UserFaker().UseSeed(123)
+                .Generate(438)
+                .OrderByDirection<User, string?>(
+                    state.sortDirection,
+                    state.sortBy switch
+                    {
+                        UserSortableField.FirstName => x => x.FirstName,
+                        UserSortableField.LastName => x => x.LastName,
+                        UserSortableField.Age => x => x.Age.ToString(),
+                        UserSortableField.Email => x => x.Email,
+                        _ => throw new ArgumentOutOfRangeException()
+                    })
+                .ToList();
+
+        return Task.FromResult((users.Skip((state.page - 1) * state.pageSize).Take(state.pageSize), users.Count));
+    }
+
+    private sealed class UserFaker : Faker<User>
+    {
+        public UserFaker() : base("en")
+        {
+            RuleFor(u => u.FirstName, (f, u) => f.Name.FirstName(u.Gender == 'F' ? Name.Gender.Female : Name.Gender.Male));
+            RuleFor(u => u.LastName, f => f.Person.LastName);
+            RuleFor(u => u.Age, f => f.Random.Int(18, 99));
+
+            RuleFor(
+                u => u.Gender,
+                f =>
+                    f.Person.Gender switch
+                    {
+                        Name.Gender.Female => 'F',
+                        Name.Gender.Male => 'M',
+                        _ => throw new UnreachableException()
+                    });
+
+            RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName));
+        }
+    }
+
+    public class User
+    {
+        public string? FirstName { get; set; }
+
+        public string? LastName { get; set; }
+
+        public int Age { get; set; }
+
+        public char Gender { get; set; }
+
+        public string? Email { get; set; }
+    }
+
+    public enum UserSortableField
+    {
+        FirstName,
+        LastName,
+        Age,
+        Email,
+    }
+}

@@ -18,8 +18,7 @@
     <ItemGroup>
         <ProjectReference
             Include="..\..\orchestration\service-defaults\AlasdairCooper.Reference.Orchestration.ServiceDefaults.csproj" />
-        <ProjectReference
-            Include="..\..\orchestration\shared\AlasdairCooper.Reference.Orchestration.Shared.csproj" />
+        <ProjectReference Include="..\..\shared\AlasdairCooper.Reference.Shared.csproj" />
         <ProjectReference Include="..\data\AlasdairCooper.Reference.Api.Data.csproj" />
     </ItemGroup>
 </Project>

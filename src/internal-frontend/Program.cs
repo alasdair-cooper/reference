@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using AlasdairCooper.Reference.InternalFrontend;
-using AlasdairCooper.Reference.Orchestration.Shared.Api;
-using AlasdairCooper.Reference.Orchestration.Shared.Orchestration;
+using AlasdairCooper.Reference.Shared.Api;
+using AlasdairCooper.Reference.Shared.Orchestration;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 

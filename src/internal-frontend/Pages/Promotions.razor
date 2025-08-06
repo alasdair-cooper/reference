@@ -1,4 +1,4 @@
-﻿@using AlasdairCooper.Reference.Orchestration.Shared.Api
+﻿@using AlasdairCooper.Reference.Shared.Api
 
 @page "/promotions"
 
@@ -9,19 +9,19 @@
 <h1>Promotions</h1>
 
 <Table
-    DataProvider="async () => (await _client.ListPromotionsAsync(), 100)"
-    T="PromotionDto">
+    State="new object()"
+    DataProvider="async Task<(IEnumerable<PromotionDto>, int)> (_) => (await _client.ListPromotionsAsync(), 100)">
     <Column
         Title="Name"
         Property="x => x.DisplayName" />
     <Column Title="Period">
         <CellContent>
-            @context.StartDate - @context.EndDate
+            @context.Item.StartDate - @context.Item.EndDate
         </CellContent>
     </Column>
     <Column Title="Media">
         <CellContent>
-            @context.MediaUrls.Length
+            @context.Item.MediaUrls.Length
         </CellContent>
     </Column>
 </Table>

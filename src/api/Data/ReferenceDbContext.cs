@@ -5,7 +5,7 @@ using AlasdairCooper.Reference.Api.Data.Entities.DiscountStrategies;
 using AlasdairCooper.Reference.Api.Data.Entities.Media;
 using AlasdairCooper.Reference.Api.Data.Entities.Users;
 using AlasdairCooper.Reference.Api.Data.Utilities;
-using AlasdairCooper.Reference.Orchestration.Shared.Common;
+using AlasdairCooper.Reference.Shared.Common;
 using Microsoft.EntityFrameworkCore;
 using File = AlasdairCooper.Reference.Api.Data.Entities.Media.File;
 

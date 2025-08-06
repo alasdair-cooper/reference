@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using AlasdairCooper.Reference.Api.Data;
 using AlasdairCooper.Reference.Api.Data.Entities.Users;
-using AlasdairCooper.Reference.Orchestration.Shared.Api;
+using AlasdairCooper.Reference.Shared.Api;
 using Microsoft.EntityFrameworkCore;
 
 namespace AlasdairCooper.Reference.Api.Features.Users;

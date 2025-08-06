@@ -4,8 +4,8 @@ using AlasdairCooper.Reference.Api.Features.Media;
 using AlasdairCooper.Reference.Api.Features.Promotions;
 using AlasdairCooper.Reference.Api.Features.Users;
 using AlasdairCooper.Reference.Api.Utilities;
-using AlasdairCooper.Reference.Orchestration.Shared.Common;
-using AlasdairCooper.Reference.Orchestration.Shared.Orchestration;
+using AlasdairCooper.Reference.Shared.Common;
+using AlasdairCooper.Reference.Shared.Orchestration;
 
 var builder = WebApplication.CreateBuilder(args);
 

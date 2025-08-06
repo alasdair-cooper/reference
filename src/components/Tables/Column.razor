@@ -1,0 +1,32 @@
+﻿@typeparam T
+@typeparam TState
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required string Title { get; set; }
+    
+    [Parameter]
+    public Func<T, object?>? Property { get; set; }
+    
+    [Parameter]
+    public RenderFragment<CellContext<T>>? CellContent { get; set; } 
+    
+    [CascadingParameter]
+    public Table<T, TState>? Table { get; set; }
+    
+    [Parameter]
+    public int? Ordinal { get; set; } 
+
+    protected override void OnParametersSet()
+    {
+        if (Table is null)
+        {
+            throw new InvalidOperationException($"{nameof(Column<,>)} must be used within a {nameof(Table<,>)} component.");
+        }
+
+        Table.RegisterColumn(this);
+    }
+
+}

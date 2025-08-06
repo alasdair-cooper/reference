@@ -1,4 +1,4 @@
-﻿@using AlasdairCooper.Reference.Orchestration.Shared.Api
+﻿@using AlasdairCooper.Reference.Shared.Api
 
 @page "/users"
 
@@ -11,14 +11,14 @@
 <Table
     @bind-Page="_page"
     @bind-PageSize="_pageSize"
-    DataProvider="FetchDataAsync"
-    T="UserDto">
+    State="new object()"
+    DataProvider="FetchDataAsync">
     <Column
         Title="First Name"
         Property="x => x.FirstName" />
     <Column Title="Middle Names">
         <CellContent>
-            @string.Join(' ', context.MiddleNames)
+            @string.Join(' ', context.Item.MiddleNames)
         </CellContent>
     </Column>
     <Column
@@ -35,6 +35,6 @@
 
     public Users(ApiClient client) => _client = client;
 
-    private async Task<(IEnumerable<UserDto>, int)> FetchDataAsync() => await _client.ListUsersAsync(_page, _pageSize);
+    private async Task<(IEnumerable<UserDto>, int)> FetchDataAsync(object _) => await _client.ListUsersAsync(_page, _pageSize);
 
 }

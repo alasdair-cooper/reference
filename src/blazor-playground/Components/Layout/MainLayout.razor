@@ -1,0 +1,28 @@
+﻿@using System.Reflection
+@using Humanizer
+@inherits LayoutComponentBase
+
+<DialogRenderer/>
+
+<nav style="display: flex; gap: 1rem;">
+    @foreach (var (pageType, routeAttribute) in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsAssignableTo(typeof(IComponent))).SelectMany(pageType => pageType.GetCustomAttributes().OfType<RouteAttribute>().Select(routeAttribute => (pageType, routeAttribute))).OrderBy(x => x.routeAttribute.Template.Length))
+    {
+        <NavLink href="@routeAttribute.Template" Match="NavLinkMatch.All">
+            @pageType.Name.Titleize()
+        </NavLink>
+    }
+</nav>
+
+<hr/>
+
+@Body
+
+<div
+    id="blazor-error-ui"
+    data-nosnippet>
+    An unhandled error has occurred.
+    <a
+        href="."
+        class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

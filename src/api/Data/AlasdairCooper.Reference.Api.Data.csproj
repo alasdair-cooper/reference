@@ -12,7 +12,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\..\orchestration\shared\AlasdairCooper.Reference.Orchestration.Shared.csproj" />
+      <ProjectReference Include="..\..\shared\AlasdairCooper.Reference.Shared.csproj" />
     </ItemGroup>
 
 </Project>

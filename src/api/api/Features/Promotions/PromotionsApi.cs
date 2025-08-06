@@ -4,8 +4,8 @@ using AlasdairCooper.Reference.Api.Data.Entities;
 using AlasdairCooper.Reference.Api.Data.Entities.Discounts;
 using AlasdairCooper.Reference.Api.Data.Entities.DiscountStrategies;
 using AlasdairCooper.Reference.Api.Features.Media;
-using AlasdairCooper.Reference.Orchestration.Shared;
-using AlasdairCooper.Reference.Orchestration.Shared.Api;
+using AlasdairCooper.Reference.Shared;
+using AlasdairCooper.Reference.Shared.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

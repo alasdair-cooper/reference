@@ -1,5 +1,5 @@
 ﻿using AlasdairCooper.Reference.Api.Data.Entities;
-using AlasdairCooper.Reference.Orchestration.Shared.Common;
+using AlasdairCooper.Reference.Shared.Common;
 
 namespace AlasdairCooper.Reference.Api.Data.Utilities;
 

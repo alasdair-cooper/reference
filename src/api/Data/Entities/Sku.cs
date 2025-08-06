@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AlasdairCooper.Reference.Api.Data.Utilities;
-using AlasdairCooper.Reference.Orchestration.Shared.Common;
+using AlasdairCooper.Reference.Shared.Common;
 
 namespace AlasdairCooper.Reference.Api.Data.Entities;
 
