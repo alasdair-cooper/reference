@@ -1,0 +1,103 @@
+﻿@typeparam T
+
+@attribute [CascadingTypeParameter(nameof(T))]
+
+<table>
+    <thead>
+        <tr>
+            @foreach (var column in _columns)
+            {
+                <th>@column.Title</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in _data)
+        {
+            <tr>
+                @foreach (var column in _columns)
+                {
+                    <td>
+                        @switch (column)
+                        {
+                            case { CellContent: { } cellContent }:
+                                @cellContent(row)
+                                break;
+                            case { Property: { } property }:
+                                @property(row)
+                                break;
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<TableFooter
+    TotalCount="_totalCount"
+    Page="Page"
+    PageChanged="OnPageChangedAsync"
+    PageSize="PageSize"
+    PageSizeChanged="OnPageSizeChangedAsync" />
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    private List<T> _data = [];
+    private int _totalCount;
+    private readonly HashSet<Column<T>> _columns = [];
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public required Func<Task<(IEnumerable<T> data, int totalCount)>> DataProvider { get; set; }
+
+    [Parameter]
+    public int Page { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+    
+    public async Task OnPageChangedAsync(int page)
+    {
+        Page = page;
+        await PageChanged.InvokeAsync(page);
+        await LoadDataAsync();
+    }
+    
+    public async Task OnPageSizeChangedAsync(int pageSize)
+    {
+        PageSize = pageSize;
+        await PageSizeChanged.InvokeAsync(pageSize);
+        await LoadDataAsync();
+    }
+
+    public void RegisterColumn(Column<T> column)
+    {
+        if (_columns.Add(column))
+        {
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
+
+    private async Task LoadDataAsync()
+    {
+        var (data, totalCount) = await DataProvider();
+        _data = data.ToList();
+        _totalCount = totalCount;
+    }
+
+}

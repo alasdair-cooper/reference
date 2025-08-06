@@ -49,6 +49,9 @@ public class ReferenceDbContext(DbContextOptions<ReferenceDbContext> options) : 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresExtension(DatabaseConstants.PostgresExtensions.FuzzyStringMatch);
+        modelBuilder.HasPostgresExtension(DatabaseConstants.PostgresExtensions.Trigrams);
+        
         modelBuilder.Entity<User>(x => { x.HasDiscriminator().HasValue<AnonymousUser>("anon").HasValue<AuthenticatedUser>("known"); });
 
         modelBuilder.Entity<AuthenticatedUser>(

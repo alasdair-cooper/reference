@@ -1,0 +1,40 @@
+﻿@using AlasdairCooper.Reference.Orchestration.Shared.Api
+
+@page "/users"
+
+@code { public static string Url() => "/users"; }
+
+<PageTitle>Users</PageTitle>
+
+<h1>Users</h1>
+
+<Table
+    @bind-Page="_page"
+    @bind-PageSize="_pageSize"
+    DataProvider="FetchDataAsync"
+    T="UserDto">
+    <Column
+        Title="First Name"
+        Property="x => x.FirstName" />
+    <Column Title="Middle Names">
+        <CellContent>
+            @string.Join(' ', context.MiddleNames)
+        </CellContent>
+    </Column>
+    <Column
+        Title="Last Name"
+        Property="x => x.LastName" />
+</Table>
+
+@code {
+
+    private int _page = 1;
+    private int _pageSize = 10;
+
+    private readonly ApiClient _client;
+
+    public Users(ApiClient client) => _client = client;
+
+    private async Task<(IEnumerable<UserDto>, int)> FetchDataAsync() => await _client.ListUsersAsync(_page, _pageSize);
+
+}

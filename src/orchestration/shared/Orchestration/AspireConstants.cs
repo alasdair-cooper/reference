@@ -6,6 +6,7 @@ public class AspireConstants
     {
         public const string Api = "api";
         public const string Migrator = "migrator";
+        public const string Generator = "generator";
         public const string InternalFrontend = "internal-frontend";
         public const string ExternalFrontend = "external-frontend";
         public const string DatabaseServer = "postgres-server";

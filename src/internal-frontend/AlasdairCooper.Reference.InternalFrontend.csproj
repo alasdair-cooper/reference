@@ -18,4 +18,10 @@
     <ProjectReference Include="..\orchestration\shared\AlasdairCooper.Reference.Orchestration.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Utilities\Tables\TableFooter.razor.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

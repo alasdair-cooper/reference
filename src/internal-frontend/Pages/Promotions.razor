@@ -8,43 +8,28 @@
 
 <h1>Promotions</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
-
-@if (_promotions == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Period</th>
-                <th>Media</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var promotion in _promotions)
-            {
-                <tr>
-                    <td>@promotion.DisplayName</td>
-                    <td>@promotion.StartDate - @promotion.EndDate</td>
-                    <td>@promotion.MediaUrls.Length</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<Table
+    DataProvider="async () => (await _client.ListPromotionsAsync(), 100)"
+    T="PromotionDto">
+    <Column
+        Title="Name"
+        Property="x => x.DisplayName" />
+    <Column Title="Period">
+        <CellContent>
+            @context.StartDate - @context.EndDate
+        </CellContent>
+    </Column>
+    <Column Title="Media">
+        <CellContent>
+            @context.MediaUrls.Length
+        </CellContent>
+    </Column>
+</Table>
 
 @code {
 
     private readonly ApiClient _client;
-    
-    private List<PromotionDto>? _promotions;
 
-    public Promotions(ApiClient client) => _client  = client;
-
-    protected override async Task OnInitializedAsync() => _promotions = await _client.ListPromotionsAsync();
+    public Promotions(ApiClient client) => _client = client;
 
 }

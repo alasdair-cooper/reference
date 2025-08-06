@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\api\api\AlasdairCooper.Reference.Api.csproj" />
+        <ProjectReference Include="..\..\api\generator\AlasdairCooper.Reference.Api.Generator.csproj" />
         <ProjectReference Include="..\..\api\migrator\AlasdairCooper.Reference.Api.Migrator.csproj" />
         <ProjectReference Include="..\..\internal-frontend\AlasdairCooper.Reference.InternalFrontend.csproj" />
         <ProjectReference Include="..\..\orchestration\shared\AlasdairCooper.Reference.Orchestration.Shared.csproj" IsAspireProjectResource="false" />
