@@ -13,14 +13,13 @@
     @foreach (var value in Enum.GetValues<UserSortableField>().Select(IEnumerable<(SortDirection dir, UserSortableField field)> (x) => [(SortDirection.Ascending, x), (SortDirection.Descending, x)]).SelectMany(x => x))
     {
         <Option Value="@value">
-            @value.field
-            @(
-            value.dir switch
-            {
-                SortDirection.Ascending => new MarkupString("&ShortDownArrow;"),
-                SortDirection.Descending => new MarkupString("&ShortUpArrow;"),
-                _ => throw new ArgumentOutOfRangeException()
-            })
+            <span>
+                @value.field
+            </span>
+            <div style="flex: 1 1"></div>
+            <span>
+                @ToDisplayString(ToSortType(value.field), value.dir)
+            </span>
         </Option>
     }
 </Select>
@@ -47,15 +46,6 @@
         Title="Email"
         Property="x => x.Email" />
 </Table>
-
-<Select
-    @bind-Value="_pageSize"
-    Label="Items per page">
-    <Option value="10">10</Option>
-    <Option value="25">25</Option>
-    <Option value="50">50</Option>
-    <Option value="100">100</Option>
-</Select>
 
 @code {
 
@@ -126,5 +116,31 @@
         Age,
         Email,
     }
+    
+    private static SortType ToSortType(UserSortableField field) => field switch
+    {
+        UserSortableField.FirstName or UserSortableField.LastName => SortType.Alphabetical,
+        UserSortableField.Age => SortType.Numerical,
+        UserSortableField.Email => SortType.Other,
+        _ => throw new UnreachableException()
+    };
+
+    public enum SortType
+    {
+        Other,
+        Alphabetical,
+        Numerical,
+    }
+
+    private static string ToDisplayString(SortType sortType, SortDirection sortDirection) => (sortType, sortDirection) switch
+    {
+        (SortType.Alphabetical, SortDirection.Ascending) => "A-Z",
+        (SortType.Alphabetical, SortDirection.Descending) => "Z-A",
+        (SortType.Numerical, SortDirection.Ascending) => "Low to High",
+        (SortType.Numerical, SortDirection.Descending) => "High to Low",
+        (SortType.Other, SortDirection.Ascending) => "Ascending",
+        (SortType.Other, SortDirection.Descending) => "Descending",
+        _ => throw new UnreachableException()
+    };
 
 }

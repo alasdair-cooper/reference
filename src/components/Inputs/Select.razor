@@ -1,16 +1,21 @@
-﻿@typeparam T
+﻿@inherits DefaultComponentBase
+
+@typeparam T
 
 @attribute [CascadingTypeParameter(nameof(T))]
 
 @if (Label is not null)
 {
-    <label for="@_id">
+    <label for="@Id">
         @Label
     </label>
 }
 
 <select
-    id="@_id"
+    id="@Id"
+    style="@Style"
+    class="@Class"
+    @attributes="AdditionalAttributes"
     @bind="_selectedIndex"
     @bind:after="OnSelectedIndexChanged">
     <button>
@@ -18,7 +23,14 @@
     </button>
     @foreach (var (index, option) in _options.Index())
     {
-        <option value="@index">@option.ChildContent</option>
+        <option
+            id="@option.Id"
+            style="@option.Style"
+            class="@option.Class"
+            @attributes="AdditionalAttributes"
+            value="@index">
+            @option.ChildContent
+        </option>
     }
 </select>
 
@@ -28,16 +40,17 @@
 
 @code {
 
-    private readonly string _id = $"select-{Guid.NewGuid()}"; 
     private int? _selectedIndex;
     private readonly HashSet<Option<T>> _options = [];
+
+    private new string Id { get => base.Id ?? field; } = $"select-{Guid.NewGuid()}";
 
     [Parameter]
     public T Value { get; set; } = default!;
 
     [Parameter]
     public EventCallback<T> ValueChanged { get; set; }
-    
+
     [Parameter]
     public string? Label { get; set; }
 
@@ -52,7 +65,7 @@
         {
             _selectedIndex = _options.Count - 1;
         }
-            
+
         StateHasChanged();
     }
 

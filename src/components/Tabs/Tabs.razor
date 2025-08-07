@@ -1,4 +1,10 @@
-﻿<div>
+﻿@inherits DefaultComponentBase
+
+<nav
+    id="@Id"
+    style="@Style"
+    class="@Class"
+    @attributes="AdditionalAttributes">
     @foreach (var (index, tab) in _tabs.Index())
     {
         var id = $"tab-header-{Guid.NewGuid()}";
@@ -10,13 +16,27 @@
             checked="@(_selectedTabIndex == index)"
             @onchange="@(() => ChangeTab(index))"
             hidden>
-        <label for="@id">
+        <label
+            for="@id"
+            id="@tab.HeaderId"
+            class="@tab.HeaderClass"
+            style="@tab.HeaderStyle"
+            @attributes="tab.HeaderAdditionalAttributes">
             @tab.HeaderContent
         </label>
     }
-</div>
+</nav>
 
-@_tabs.ElementAtOrDefault(_selectedTabIndex)?.ChildContent
+@if (_tabs.ElementAtOrDefault(_selectedTabIndex) is { } currentTab)
+{
+    <div
+        id="@currentTab.Id"
+        style="@currentTab.Style"
+        class="@currentTab.Class"
+        @attributes="@currentTab.AdditionalAttributes">
+        @currentTab.ChildContent
+    </div>
+}
 
 <CascadingValue Value="this">
     @ChildContent

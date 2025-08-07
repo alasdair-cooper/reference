@@ -1,4 +1,6 @@
-﻿@code {
+﻿@inherits DefaultComponentBase
+
+@code {
 
     private RenderFragment TitleFragment =>
         @<span>@Title</span>;
@@ -14,6 +16,18 @@
 
     [CascadingParameter]
     public Tabs? Tabs { get; set; }
+    
+    [Parameter]
+    public string? HeaderId { get; set; }
+    
+    [Parameter]
+    public string? HeaderClass { get; set; }
+    
+    [Parameter]
+    public string? HeaderStyle { get; set; }
+    
+    [Parameter]
+    public Dictionary<string, object?>? HeaderAdditionalAttributes { get; set; }
 
     protected override void OnParametersSet()
     {
