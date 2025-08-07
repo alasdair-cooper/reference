@@ -1,0 +1,29 @@
+﻿@if (Href is not null)
+{
+    <a href="@Href">
+        @ChildContent       
+    </a>
+}
+else
+{
+    <button @onclick="OnClick">
+        @ChildContent
+    </button>
+}
+
+@code {
+    
+    private RenderFragment TextContent => @<span>@Text</span>;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+    
+    [Parameter]
+    public string? Href { get; set; } 
+
+    [Parameter]
+    public string? Text { get; set; }
+    
+    [Parameter]
+    public RenderFragment? ChildContent { get => field ?? TextContent; set; }
+}

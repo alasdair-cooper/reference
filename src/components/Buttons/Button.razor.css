@@ -1,0 +1,29 @@
+﻿button, a {
+    border: 1px solid currentColor;
+    display: inline-block;
+    background: transparent;
+    text-decoration: none;
+    color: currentColor;
+    font-size: 1em;
+    cursor: pointer;
+    text-box-edge: cap alphabetic;
+    text-box-trim: trim-both;
+    box-sizing: border-box;
+    min-width: 6rem;
+    padding: 0.5rem 1rem;
+    text-align: center;
+}
+
+button:is(:hover, :focus), a:is(:hover, :focus) {
+    animation: bounce 0.6s ease-in-out;
+    scale: 1.1;
+}
+
+@keyframes bounce {
+    0% {
+        transform: scale(1);
+    }
+    60% {
+        transform: scale(1.2);
+    } 
+}

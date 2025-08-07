@@ -51,8 +51,8 @@
 
     private int _page = 1;
     private int _pageSize = 10;
-    private SortDirection _sortDirection;
-    private UserSortableField _sortBy;
+    private SortDirection _sortDirection = SortDirection.Ascending;
+    private UserSortableField _sortBy = UserSortableField.FirstName;
 
     private static Task<(IEnumerable<User>, int)> FetchDataAsync((int page, int pageSize, SortDirection sortDirection, UserSortableField sortBy) state)
     {

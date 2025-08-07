@@ -1,6 +1,9 @@
 ﻿@using System.Reflection
 @using Humanizer
+@using AlasdairCooper.Reference.Components.Inputs
 @using AlasdairCooper.Reference.Components.Dialog
+@using AlasdairCooper.Reference.Components.Utilities
+
 @inherits LayoutComponentBase
 
 <DialogRenderer />
@@ -14,6 +17,8 @@
             @pageType.Name.Titleize()
         </NavLink>
     }
+    <Spacer/>
+    <ThemeSelect />
 </nav>
 
 <hr />

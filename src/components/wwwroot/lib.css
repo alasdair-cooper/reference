@@ -1,0 +1,20 @@
+﻿:root {
+    --theme: light;
+    color-scheme: var(--theme);
+
+    @media (prefers-color-scheme: dark){
+        --theme: dark;
+    }
+}
+
+:root:has(#theme [data-theme="light"]:checked){
+    --theme: light;
+}
+
+:root:has(#theme [data-theme="dark"]:checked){
+    --theme: dark;
+}
+
+* {
+    font-family: system-ui;
+}

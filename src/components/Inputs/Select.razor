@@ -40,7 +40,7 @@
 
 @code {
 
-    private int? _selectedIndex;
+    private int _selectedIndex;
     private readonly HashSet<Option<T>> _options = [];
 
     private new string Id { get => base.Id ?? field; } = $"select-{Guid.NewGuid()}";
@@ -57,29 +57,29 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+    protected override void OnParametersSet() => SetSelectedIndexForValue();
+
     public void RegisterOption(Option<T> option)
     {
         if (!_options.Add(option)) return;
 
-        if (option.Value?.Equals(Value) is true || (option.Value is null && Value is null))
-        {
-            _selectedIndex = _options.Count - 1;
-        }
+        SetSelectedIndexForValue();
 
         StateHasChanged();
     }
 
+    private void SetSelectedIndexForValue()
+    {
+        if (_options.Select(x => x.Value).ToList().IndexOf(Value) is var index and >= 0)
+        {
+            _selectedIndex = index;
+        }
+    }
+
     private async Task OnSelectedIndexChanged()
     {
-        if (_selectedIndex is not null)
-        {
-            var option = _options.ElementAtOrDefault(_selectedIndex.Value);
-            await ValueChanged.InvokeAsync(option is not null ? option.Value : default);
-        }
-        else
-        {
-            await ValueChanged.InvokeAsync(default);
-        }
+        var option = _options.ElementAtOrDefault(_selectedIndex);
+        await ValueChanged.InvokeAsync(option is not null ? option.Value : default);
     }
 
 }
