@@ -2,7 +2,15 @@
 
 @attribute [CascadingTypeParameter(nameof(T))]
 
+@if (Label is not null)
+{
+    <label for="@_id">
+        @Label
+    </label>
+}
+
 <select
+    id="@_id"
     @bind="_selectedIndex"
     @bind:after="OnSelectedIndexChanged">
     <button>
@@ -20,6 +28,7 @@
 
 @code {
 
+    private readonly string _id = $"select-{Guid.NewGuid()}"; 
     private int? _selectedIndex;
     private readonly HashSet<Option<T>> _options = [];
 
@@ -28,6 +37,9 @@
 
     [Parameter]
     public EventCallback<T> ValueChanged { get; set; }
+    
+    [Parameter]
+    public string? Label { get; set; }
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
