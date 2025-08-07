@@ -2,11 +2,11 @@
 
 <div class="footer">
     <span>@TotalCount items</span>
-    <button @onclick="GoToFirstPage">&lt;&lt;</button>
-    <button @onclick="GoToPreviousPage">&lt;</button>
+    <button @onclick="GoToFirstPage" disabled="@IsFirstPage()">&lt;&lt;</button>
+    <button @onclick="GoToPreviousPage" disabled="@IsFirstPage()">&lt;</button>
     <span>Page @Page of @GetTotalPages(PageSize)</span>
-    <button @onclick="GoToNextPage">&gt;</button>
-    <button @onclick="GoToLastPage">&gt;&gt;</button>
+    <button @onclick="GoToNextPage" disabled="@IsLastPage()">&gt;</button>
+    <button @onclick="GoToLastPage" disabled="@IsLastPage()">&gt;&gt;</button>
 </div>
 
 <Select
