@@ -1,0 +1,60 @@
+﻿@typeparam T
+
+@attribute [CascadingTypeParameter(nameof(T))]
+
+<select
+    @bind="_selectedIndex"
+    @bind:after="OnSelectedIndexChanged">
+    <button>
+        <selectedcontent></selectedcontent>
+    </button>
+    @foreach (var (index, option) in _options.Index())
+    {
+        <option value="@index">@option.ChildContent</option>
+    }
+</select>
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    private int? _selectedIndex;
+    private readonly HashSet<Option<T>> _options = [];
+
+    [Parameter]
+    public T Value { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public void RegisterOption(Option<T> option)
+    {
+        if (!_options.Add(option)) return;
+
+        if (option.Value?.Equals(Value) is true || (option.Value is null && Value is null))
+        {
+            _selectedIndex = _options.Count - 1;
+        }
+            
+        StateHasChanged();
+    }
+
+    private async Task OnSelectedIndexChanged()
+    {
+        if (_selectedIndex is not null)
+        {
+            var option = _options.ElementAtOrDefault(_selectedIndex.Value);
+            await ValueChanged.InvokeAsync(option is not null ? option.Value : default);
+        }
+        else
+        {
+            await ValueChanged.InvokeAsync(default);
+        }
+    }
+
+}
