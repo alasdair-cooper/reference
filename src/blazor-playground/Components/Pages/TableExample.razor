@@ -1,30 +1,29 @@
 ﻿@using System.Diagnostics
-@using System.Text.Json
 @using AlasdairCooper.Reference.Components.Tables
+@using AlasdairCooper.Reference.Components.Inputs
 @using Bogus
 @using Bogus.DataSets
 
 @page "/table"
 
-<label for="sort-by">Sort by</label>
-
-<select
-    @bind:get="JsonSerializer.Serialize((_sortDirection, _sortBy), JsonSerializerOptions)"
-    @bind:set="x => (_sortDirection, _sortBy) = JsonSerializer.Deserialize<(SortDirection, UserSortableField)>(x, JsonSerializerOptions)"
-    id="sort-by">
+<Select
+    @bind-Value:get="(_sortDirection, _sortBy)"
+    @bind-Value:set="x => (_sortDirection, _sortBy) = x"
+    Label="Sort by">
     @foreach (var value in Enum.GetValues<UserSortableField>().Select(IEnumerable<(SortDirection dir, UserSortableField field)> (x) => [(SortDirection.Ascending, x), (SortDirection.Descending, x)]).SelectMany(x => x))
     {
-        <option value="@JsonSerializer.Serialize(value, JsonSerializerOptions)">
+        <Option Value="@value">
             @value.field
-            @(value.dir switch
+            @(
+            value.dir switch
             {
                 SortDirection.Ascending => new MarkupString("&ShortDownArrow;"),
                 SortDirection.Descending => new MarkupString("&ShortUpArrow;"),
                 _ => throw new ArgumentOutOfRangeException()
             })
-        </option>
+        </Option>
     }
-</select>
+</Select>
 
 <Table
     DataProvider="FetchDataAsync"
@@ -49,16 +48,14 @@
         Property="x => x.Email" />
 </Table>
 
-<label for="page-size">Items per page</label>
-
-<select
-    @bind="_pageSize"
-    id="page-size">
-    <option value="10">10</option>
-    <option value="25">25</option>
-    <option value="50">50</option>
-    <option value="100">100</option>
-</select>
+<Select
+    @bind-Value="_pageSize"
+    Label="Items per page">
+    <Option value="10">10</Option>
+    <Option value="25">25</Option>
+    <Option value="50">50</Option>
+    <Option value="100">100</Option>
+</Select>
 
 @code {
 
@@ -67,20 +64,18 @@
     private SortDirection _sortDirection;
     private UserSortableField _sortBy;
 
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new() { IncludeFields = true };
-
     private static Task<(IEnumerable<User>, int)> FetchDataAsync((int page, int pageSize, SortDirection sortDirection, UserSortableField sortBy) state)
     {
         var users =
             new UserFaker().UseSeed(123)
                 .Generate(438)
-                .OrderByDirection<User, string?>(
+                .OrderByDirection(
                     state.sortDirection,
                     state.sortBy switch
                     {
                         UserSortableField.FirstName => x => x.FirstName,
                         UserSortableField.LastName => x => x.LastName,
-                        UserSortableField.Age => x => x.Age.ToString(),
+                        UserSortableField.Age => x => x.Age,
                         UserSortableField.Email => x => x.Email,
                         _ => throw new ArgumentOutOfRangeException()
                     })
@@ -131,4 +126,5 @@
         Age,
         Email,
     }
+
 }

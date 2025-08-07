@@ -55,9 +55,11 @@
 
             configureParams.Invoke(dialog);
 
+#pragma warning disable BL0005
             dialog.OnSubmit = result.SetResult;
             dialog.OnCancel = result.SetCanceled;
             dialog.OnLoad = async () => await ShowDialogAsync(id);
+#pragma warning restore BL0005
         }
     }
 

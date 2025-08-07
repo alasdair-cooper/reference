@@ -4,10 +4,10 @@ namespace AlasdairCooper.Reference.Components.Tables;
 
 public static class Extensions
 {
-    public static IOrderedEnumerable<TSource> OrderByDirection<TSource, TKey>(
+    public static IOrderedEnumerable<TSource> OrderByDirection<TSource>(
         this IEnumerable<TSource> source,
         SortDirection direction,
-        Func<TSource, TKey> keySelector) =>
+        Func<TSource, object?> keySelector) =>
         direction switch
         {
             SortDirection.Ascending => source.OrderBy(keySelector),
