@@ -2,6 +2,7 @@
 
 @typeparam T
 
+@using System.Diagnostics
 @typeparam TState
 
 @attribute [CascadingTypeParameter(nameof(T))]
@@ -43,13 +44,16 @@
     </tbody>
 </table>
 
-<TableFooter
-    TotalCount="_totalCount"
-    Page="Page"
-    PageChanged="OnPageChangedAsync"
-    PageSize="PageSize"
-    PageSizeChanged="OnPageSizeChangedAsync"
-    PageSizes="PageSizes" />
+@if (!IsPagingDisabled)
+{
+    <TableFooter
+        TotalCount="_totalCount"
+        Page="Page"
+        PageChanged="OnPageChangedAsync"
+        PageSize="PageSize"
+        PageSizeChanged="OnPageSizeChangedAsync"
+        PageSizes="PageSizes"/>
+}
 
 <CascadingValue Value="this">
     @ChildContent
@@ -81,6 +85,9 @@
     
     [Parameter]
     public IEnumerable<int> PageSizes { get; set; } = [10, 25, 50, 100];
+
+    [Parameter]
+    public bool IsPagingDisabled { get; set; } 
 
     [Parameter]
     [EditorRequired]
@@ -119,7 +126,10 @@
     private async Task LoadDataAsync()
     {
         var (data, totalCount) = await DataProvider(State);
+        
         _data = data.ToList();
+        Debug.Assert(_data.Count == PageSize);
+        
         _totalCount = totalCount;
     }
 
