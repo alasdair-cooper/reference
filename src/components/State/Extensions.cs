@@ -9,6 +9,8 @@ public static class Extensions
     {
         services.AddCascadingAuthenticationState();
 
+        services.AddSingleton<StateStoreFactory>();
+
         return services.AddOptionsWithValidateOnStart<StateOptions>();
     }
 }

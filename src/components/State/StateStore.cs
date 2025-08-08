@@ -1,5 +1,16 @@
 ﻿namespace AlasdairCooper.Reference.Components.State;
 
+public class StateStore<T> : StateStore<object, T>
+{
+    public StateStore(Func<LoadingState, CancellationToken, ValueTask<T>> factory, StateOptions options) : base(
+        (_, state, ct) => factory(state, ct),
+        options) { }
+
+    public StateStore(Func<CancellationToken, ValueTask<T>> factory, StateOptions options) : base((_, ct) => factory(ct), options) { }
+
+    public async Task LoadAsync() => await LoadAsync(new object());
+}
+
 public class StateStore<TParameters, T>
 {
     private readonly Func<TParameters, LoadingState, CancellationToken, ValueTask<T>> _factory;
@@ -8,24 +19,22 @@ public class StateStore<TParameters, T>
 
     public event EventHandler<State>? StateChanged;
 
-    public StateStore(Func<TParameters, LoadingState, CancellationToken, ValueTask<T>> factory, Action<StateOptions>? configureOptions)
+    public StateStore(Func<TParameters, LoadingState, CancellationToken, ValueTask<T>> factory, StateOptions options)
     {
         State = LoadingState.Zero(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()));
         _factory = factory;
         _supportsProgress = true;
-        _options = new StateOptions();
-        configureOptions?.Invoke(_options);
+        _options = options;
     }
 
-    public StateStore(Func<TParameters, CancellationToken, ValueTask<T>> factory, Action<StateOptions>? configureOptions)
+    public StateStore(Func<TParameters, CancellationToken, ValueTask<T>> factory, StateOptions options)
     {
         State = LoadingState.Indeterminate(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()));
         _factory = (@params, _, ct) => factory(@params, ct);
         _supportsProgress = false;
-        _options = new StateOptions();
-        configureOptions?.Invoke(_options);
+        _options = options;
     }
-    
+
     private State State
     {
         get;
@@ -67,34 +76,4 @@ public class StateStore<TParameters, T>
             State = new ErrorState(ex);
         }
     }
-}
-
-public static class StateStore
-{
-    public static StateStore<TParameters, T>
-        FromFactory<TParameters, T>(Func<TParameters, T> factory, Action<StateOptions>? configureOptions = null) =>
-        new((@params, _) => ValueTask.FromResult(factory(@params)), configureOptions);
-
-    public static StateStore<TParameters, T> FromFactory<TParameters, T>(
-        Func<TParameters, LoadingState, T> factory,
-        Action<StateOptions>? configureOptions = null) =>
-        new((@params, state, _) => ValueTask.FromResult(factory(@params, state)), configureOptions);
-
-    public static StateStore<TParameters, T> FromFactory<TParameters, T>(
-        Func<TParameters, ValueTask<T>> factory,
-        Action<StateOptions>? configureOptions = null) =>
-        new((@params, _, _) => factory(@params), configureOptions);
-
-    public static StateStore<TParameters, T> FromFactory<TParameters, T>(
-        Func<TParameters, CancellationToken, ValueTask<T>> factory,
-        Action<StateOptions>? configureOptions = null) =>
-        new(factory, configureOptions);
-
-    public static StateStore<TParameters, T> FromFactory<TParameters, T>(
-        Func<TParameters, LoadingState, CancellationToken, ValueTask<T>> factory,
-        Action<StateOptions>? configureOptions = null) =>
-        new(factory, configureOptions);
-
-    public static StateStore<TParameters, T> FromValue<TParameters, T>(T value, Action<StateOptions>? configureOptions = null) =>
-        new((_, _) => ValueTask.FromResult(value), configureOptions);
 }

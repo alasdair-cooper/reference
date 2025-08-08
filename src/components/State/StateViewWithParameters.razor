@@ -1,0 +1,121 @@
+﻿@using Humanizer
+
+@typeparam TParameters
+@typeparam T
+
+<ErrorBoundary>
+    <ChildContent>
+        @if (Policy is not null || Roles is not null || Resource is not null)
+        {
+            <AuthorizeView
+                Policy="@Policy"
+                Roles="@Roles"
+                Resource="@Resource">
+                <Authorized>
+                    @RenderState()
+                </Authorized>
+                <NotAuthorized>
+                    @RenderUnauthorized(context)
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+        else
+        {
+            @RenderState()
+        }
+    </ChildContent>
+    <ErrorContent>
+        @RenderError(new ErrorState(context))
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+
+    private State? _state;
+
+    private readonly RenderFragment<LoadingState> _defaultLoadingStateView = _ => @<span>Loading...</span>;
+
+    private readonly RenderFragment<TimedOutState> _defaultTimedOutStateView =
+        x =>
+            @<span>Timed out after @x.Timeout.Humanize()</span>;
+
+    private readonly RenderFragment<ErrorState> _defaultErrorStateView =
+        x =>
+            @<span>An error occured: @x.Exception.Message</span>;
+
+    private readonly RenderFragment<NotFoundState> _defaultNotFoundStateView = _ => @<span>Item not found.</span>;
+    private readonly RenderFragment<UnauthorizedState> _defaultUnauthorizedStateView = _ => @<span>Unauthorized.</span>;
+
+    protected RenderFragment? RenderState() =>
+        _state switch
+        {
+            LoadingState loadingState => LoadingContent?.Invoke(loadingState) ?? _defaultLoadingStateView(loadingState),
+            SuccessState<T> successState => SuccessContent?.Invoke(successState) ?? SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(successState.Value)) ?? ChildContent?.Invoke(successState),
+            NotFoundState notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(default)) ?? NotFoundContent?.Invoke(notFound) ?? _defaultNotFoundStateView(notFound),
+            ErrorState errorState => RenderError(errorState),
+            TimedOutState timedOutState => TimedOutContent?.Invoke(timedOutState) ?? _defaultTimedOutStateView(timedOutState),
+            _ => LoadingContent?.Invoke(new LoadingState()) ?? _defaultLoadingStateView(new LoadingState())
+        };
+
+    protected RenderFragment RenderError(ErrorState state) => ErrorContent?.Invoke(state) ?? _defaultErrorStateView(state);
+
+    protected RenderFragment RenderUnauthorized(AuthenticationState state) => UnauthorizedContent?.Invoke(new UnauthorizedState(state.User)) ?? _defaultUnauthorizedStateView(new UnauthorizedState(state.User));
+
+    [Parameter]
+    [EditorRequired]
+    public required StateStore<TParameters, T> Store { get; set; }
+
+    [Parameter]
+    public TParameters Parameters { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment<SuccessState<T>>? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<SuccessState<T>>? SuccessContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<SuccessOrNotFoundState<T>>? SuccessOrNotFoundContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<LoadingState>? LoadingContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<TimedOutState>? TimedOutContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<ErrorState>? ErrorContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<NotFoundState>? NotFoundContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<UnauthorizedState>? UnauthorizedContent { get; set; }
+
+    [Parameter]
+    public string? Policy { get; set; }
+
+    [Parameter]
+    public string? Roles { get; set; }
+
+    [Parameter]
+    public object? Resource { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Store.StateChanged +=
+            (_, state) =>
+            {
+                _state = state;
+                InvokeAsync(StateHasChanged);
+            };
+
+        _ = Store.LoadAsync(Parameters);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _ = Store.LoadAsync(Parameters);
+    }
+
+}
