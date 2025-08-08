@@ -1,8 +1,7 @@
 ﻿@using System.Diagnostics
+@using AlasdairCooper.Reference.BlazorPlayground.Utilities
 @using AlasdairCooper.Reference.Components.Tables
 @using AlasdairCooper.Reference.Components.Inputs
-@using Bogus
-@using Bogus.DataSets
 
 @page "/table"
 
@@ -57,8 +56,7 @@
     private static Task<(IEnumerable<User>, int)> FetchDataAsync((int page, int pageSize, SortDirection sortDirection, UserSortableField sortBy) state)
     {
         var users =
-            new UserFaker().UseSeed(123)
-                .Generate(438)
+            UserGenerator.Users.Take(500)
                 .OrderByDirection(
                     state.sortDirection,
                     state.sortBy switch
@@ -74,41 +72,6 @@
         return Task.FromResult((users.Skip((state.page - 1) * state.pageSize).Take(state.pageSize), users.Count));
     }
 
-    private sealed class UserFaker : Faker<User>
-    {
-        public UserFaker() : base("en")
-        {
-            RuleFor(u => u.FirstName, (f, u) => f.Name.FirstName(u.Gender == 'F' ? Name.Gender.Female : Name.Gender.Male));
-            RuleFor(u => u.LastName, f => f.Person.LastName);
-            RuleFor(u => u.Age, f => f.Random.Int(18, 99));
-
-            RuleFor(
-                u => u.Gender,
-                f =>
-                    f.Person.Gender switch
-                    {
-                        Name.Gender.Female => 'F',
-                        Name.Gender.Male => 'M',
-                        _ => throw new UnreachableException()
-                    });
-
-            RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FirstName, u.LastName));
-        }
-    }
-
-    public class User
-    {
-        public string? FirstName { get; set; }
-
-        public string? LastName { get; set; }
-
-        public int Age { get; set; }
-
-        public char Gender { get; set; }
-
-        public string? Email { get; set; }
-    }
-
     public enum UserSortableField
     {
         FirstName,
@@ -116,14 +79,15 @@
         Age,
         Email,
     }
-    
-    private static SortType ToSortType(UserSortableField field) => field switch
-    {
-        UserSortableField.FirstName or UserSortableField.LastName => SortType.Alphabetical,
-        UserSortableField.Age => SortType.Numerical,
-        UserSortableField.Email => SortType.Other,
-        _ => throw new UnreachableException()
-    };
+
+    private static SortType ToSortType(UserSortableField field) =>
+        field switch
+        {
+            UserSortableField.FirstName or UserSortableField.LastName => SortType.Alphabetical,
+            UserSortableField.Age => SortType.Numerical,
+            UserSortableField.Email => SortType.Other,
+            _ => throw new UnreachableException()
+        };
 
     public enum SortType
     {
@@ -132,15 +96,16 @@
         Numerical,
     }
 
-    private static string ToDisplayString(SortType sortType, SortDirection sortDirection) => (sortType, sortDirection) switch
-    {
-        (SortType.Alphabetical, SortDirection.Ascending) => "A-Z",
-        (SortType.Alphabetical, SortDirection.Descending) => "Z-A",
-        (SortType.Numerical, SortDirection.Ascending) => "Low to High",
-        (SortType.Numerical, SortDirection.Descending) => "High to Low",
-        (SortType.Other, SortDirection.Ascending) => "Ascending",
-        (SortType.Other, SortDirection.Descending) => "Descending",
-        _ => throw new UnreachableException()
-    };
+    private static string ToDisplayString(SortType sortType, SortDirection sortDirection) =>
+        (sortType, sortDirection) switch
+        {
+            (SortType.Alphabetical, SortDirection.Ascending) => "A-Z",
+            (SortType.Alphabetical, SortDirection.Descending) => "Z-A",
+            (SortType.Numerical, SortDirection.Ascending) => "Low to High",
+            (SortType.Numerical, SortDirection.Descending) => "High to Low",
+            (SortType.Other, SortDirection.Ascending) => "Ascending",
+            (SortType.Other, SortDirection.Descending) => "Descending",
+            _ => throw new UnreachableException()
+        };
 
 }
