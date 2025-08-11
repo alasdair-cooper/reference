@@ -2,6 +2,7 @@
 @using AlasdairCooper.Reference.BlazorPlayground.Utilities
 @using AlasdairCooper.Reference.Components.Tables
 @using AlasdairCooper.Reference.Components.Inputs
+@using AlasdairCooper.Reference.Components.State
 
 @page "/table"
 
@@ -23,9 +24,11 @@
     }
 </Select>
 
-<Table
-    DataProvider="FetchDataAsync"
-    State="(_page, _pageSize, _sortDirection, _sortBy)"
+<TableWithParameters
+    Store="_store"
+    Parameters="new TableParameters(_page, _pageSize, _sortDirection, _sortBy)"
+    T="User"
+    TParameters="TableParameters"
     @bind-Page="_page"
     @bind-PageSize="_pageSize">
     <IndexColumn />
@@ -44,34 +47,42 @@
     <Column
         Title="Email"
         Property="x => x.Email" />
-</Table>
+</TableWithParameters>
 
 @code {
+
+    private record TableParameters(int Page, int PageSize, SortDirection SortDirection, UserSortableField SortBy);
 
     private int _page = 1;
     private int _pageSize = 10;
     private SortDirection _sortDirection = SortDirection.Ascending;
     private UserSortableField _sortBy = UserSortableField.FirstName;
+    private readonly StateStore<TableParameters, TableData<User>> _store;
 
-    private static Task<(IEnumerable<User>, int)> FetchDataAsync((int page, int pageSize, SortDirection sortDirection, UserSortableField sortBy) state)
+    public TableExample(StateStoreFactory stateStoreFactory)
     {
-        var users =
-            UserGenerator.Users.Take(500)
-                .OrderByDirection(
-                    state.sortDirection,
-                    state.sortBy switch
-                    {
-                        UserSortableField.FirstName => x => x.FirstName,
-                        UserSortableField.LastName => x => x.LastName,
-                        UserSortableField.Age => x => x.Age,
-                        UserSortableField.Email => x => x.Email,
-                        _ => throw new ArgumentOutOfRangeException()
-                    })
-                .ToList();
+        _store =
+            stateStoreFactory.Create(
+                (TableParameters @params) =>
+                {
+                    var users =
+                        UserGenerator.Users.Take(500)
+                            .OrderByDirection(
+                                @params.SortDirection,
+                                @params.SortBy switch
+                                {
+                                    UserSortableField.FirstName => x => x.FirstName,
+                                    UserSortableField.LastName => x => x.LastName,
+                                    UserSortableField.Age => x => x.Age,
+                                    UserSortableField.Email => x => x.Email,
+                                    _ => throw new ArgumentOutOfRangeException()
+                                })
+                            .ToList();
 
-        return Task.FromResult((users.Skip((state.page - 1) * state.pageSize).Take(state.pageSize), users.Count));
+                    return new TableData<User>(users.Skip((@params.Page - 1) * @params.PageSize).Take(@params.PageSize), users.Count);
+                });
     }
-
+    
     public enum UserSortableField
     {
         FirstName,

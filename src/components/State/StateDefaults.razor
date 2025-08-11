@@ -1,0 +1,22 @@
+﻿@using Humanizer
+
+@code {
+
+    public static class DefaultContent
+    {
+        public static readonly RenderFragment<LoadingState> Loading = _ => @<span>Loading...</span>;
+
+        public static readonly RenderFragment<TimedOutState> TimedOut =
+            x =>
+                @<span>Timed out after @x.Timeout.Humanize()</span>;
+
+        public static readonly RenderFragment<ErrorState> Error =
+            x =>
+                @<span>An error occured: @x.Exception.Message</span>;
+
+        public static readonly RenderFragment<NotFoundState> NotFound = _ => @<span>Item not found.</span>;
+
+        public static readonly RenderFragment<UnauthorizedState> Unauthorized = _ => @<span>Unauthorized.</span>;
+    }
+
+}

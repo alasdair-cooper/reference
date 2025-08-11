@@ -1,13 +1,14 @@
 ﻿@using AlasdairCooper.Reference.Components.State
 
 @typeparam T
+@typeparam TParameters
 
 @inherits DefaultComponentBase
 @implements ITable<T>
 
 @attribute [CascadingTypeParameter(nameof(T))]
 
-<StateView Store="Store">
+<StateViewWithParameters Store="Store" Parameters="Parameters">
     <table
         id="@Id"
         class="@Class"
@@ -54,7 +55,7 @@
             PageSizeChanged="OnPageSizeChangedAsync"
             PageSizes="PageSizes" />
     }
-</StateView>
+</StateViewWithParameters>
 
 <CascadingValue Value="this">
     @ChildContent
@@ -68,7 +69,7 @@
     public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
-    public required StateStore<TableData<T>> Store { get; set; }
+    public required StateStore<TParameters, TableData<T>> Store { get; set; }
 
     [Parameter]
     public int Page { get; set; }
@@ -88,16 +89,19 @@
     [Parameter]
     public bool IsPagingDisabled { get; set; }
 
+    [Parameter]
+    public TParameters Parameters { get; set; } = default!;
+
     public async Task OnPageChangedAsync(int page)
     {
         await PageChanged.InvokeAsync(page);
-        await Store.LoadAsync();
+        await Store.LoadAsync(Parameters);
     }
 
     public async Task OnPageSizeChangedAsync(int pageSize)
     {
         await PageSizeChanged.InvokeAsync(pageSize);
-        await Store.LoadAsync();
+        await Store.LoadAsync(Parameters);
     }
 
     public void RegisterColumn(Column<T> column)

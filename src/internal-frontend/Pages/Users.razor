@@ -1,4 +1,5 @@
-﻿@using AlasdairCooper.Reference.Shared.Api
+﻿@using AlasdairCooper.Reference.Components.State
+@using AlasdairCooper.Reference.Shared.Api
 
 @page "/users"
 
@@ -8,11 +9,11 @@
 
 <h1>Users</h1>
 
-<Table
-    @bind-Page="_page"
-    @bind-PageSize="_pageSize"
-    State="new object()"
-    DataProvider="FetchDataAsync">
+<TableWithParameters
+    @bind-Page="_query.Page"
+    @bind-PageSize="_query.PageSize"
+    Parameters="_query"
+    Store="_userStore">
     <Column
         Title="First Name"
         Property="x => x.FirstName" />
@@ -24,17 +25,27 @@
     <Column
         Title="Last Name"
         Property="x => x.LastName" />
-</Table>
+</TableWithParameters>
 
 @code {
 
-    private int _page = 1;
-    private int _pageSize = 10;
+    private class UserQuery
+    {
+        public int Page { get; set; } = 1;
 
-    private readonly ApiClient _client;
+        public int PageSize { get; set; } = 10;
+    }
 
-    public Users(ApiClient client) => _client = client;
+    private readonly UserQuery _query = new();
+    private readonly StateStore<UserQuery, TableData<UserDto>> _userStore;
 
-    private async Task<(IEnumerable<UserDto>, int)> FetchDataAsync(object _) => await _client.ListUsersAsync(_page, _pageSize);
+    public Users(StateStoreFactory stateStoreFactory, ApiClient client) =>
+        _userStore =
+            stateStoreFactory.Create(
+                async (UserQuery query, CancellationToken ct) =>
+                {
+                    var (users, count) = await client.ListUsersAsync(query.Page, query.PageSize, cancellationToken: ct);
+                    return new TableData<UserDto>(users, count);
+                });
 
 }

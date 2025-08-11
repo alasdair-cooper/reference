@@ -9,7 +9,7 @@
 <h1>Promotions</h1>
 
 <Table
-    State="new object()"
+    Parameters="new object()"
     DataProvider="async Task<(IEnumerable<PromotionDto>, int)> (_) => (await _client.ListPromotionsAsync(), 100)">
     <Column
         Title="Name"
