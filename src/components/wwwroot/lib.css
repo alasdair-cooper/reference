@@ -40,7 +40,7 @@ pre, code {
 }
 
 dialog {
-    border: 0.125rem solid var(--_color);
-    box-shadow: --box-shadow(var(--_shade-depth), var(--_color));
+    border: 0.125rem solid var(--key-default);
+    box-shadow: --box-shadow();
     border-radius: 0.5rem;
 }
