@@ -1,9 +1,8 @@
 ﻿button, a {
-    border: 1px solid currentColor;
+    --_color: currentColor;
     display: inline-block;
     background: transparent;
     text-decoration: none;
-    color: currentColor;
     font-size: 1em;
     cursor: pointer;
     text-box-edge: cap alphabetic;
@@ -12,18 +11,23 @@
     min-width: 6rem;
     padding: 0.5rem 1rem;
     text-align: center;
+    color: var(--_color);
+    border: 0.125rem solid var(--_color);
+    box-shadow: --box-shadow(var(--_shade-depth, var(--shade-depth)), var(--_color));
+    translate: calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth))) calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth)));
+    border-radius: 0.5rem;
+    transition: box-shadow 200ms ease-in-out, translate 200ms ease-in-out;
 }
 
-button:is(:hover, :focus), a:is(:hover, :focus) {
-    animation: bounce 0.6s ease-in-out;
-    scale: 1.1;
+:is(button, a):hover {
+    --_shade-depth: var(--shade-depth-hover);
 }
 
-@keyframes bounce {
-    0% {
-        transform: scale(1);
-    }
-    60% {
-        transform: scale(1.2);
-    } 
+:is(button, a):active {
+    --_shade-depth: var(--shade-depth-active);
+}
+
+:is(button, a)[disabled] {
+    color: hsl(from var(--_color) h 0 50);
+    pointer-events: none;
 }

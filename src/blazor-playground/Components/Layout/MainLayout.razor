@@ -9,13 +9,13 @@
 <DialogRenderer />
 
 <nav style="display: flex; gap: 1rem; align-items: center;">
-    @foreach (var (_, routeAttribute) in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsAssignableTo(typeof(IComponent))).SelectMany(pageType => pageType.GetCustomAttributes().OfType<RouteAttribute>().Select(routeAttribute => (pageType, routeAttribute))).OrderBy(x => x.routeAttribute.Template.Length))
+    @foreach (var route in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsAssignableTo(typeof(IComponent))).SelectMany(x => x.GetCustomAttributes().OfType<RouteAttribute>().Select(routeAttribute => routeAttribute)).Select(x => x.Template).OrderBy(x => x.Length).Except(["/"]))
     {
         <NavLink
             style="display: inline-block; text-box-edge: cap alphabetic; text-box-trim: trim-both;"
-            href="@routeAttribute.Template"
+            href="@route"
             Match="NavLinkMatch.All">
-            @routeAttribute.Template.Titleize()
+            @route.Titleize()
         </NavLink>
     }
     <Spacer/>

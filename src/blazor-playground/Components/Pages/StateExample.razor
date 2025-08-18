@@ -58,11 +58,19 @@
     @context.Value.ToDisplayString()
 </StateView>
 
-<h2>From Factory (unauthorized)</h2>
+<h2>From Factory (missing role)</h2>
 
 <StateView
     Store="_fromFactoryStateStore"
-    Roles="Test">
+    Roles="test">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (policy fails)</h2>
+
+<StateView
+    Store="_fromFactoryStateStore"
+    Policy="test">
     @context.Value.ToDisplayString()
 </StateView>
 
@@ -107,7 +115,7 @@
                 },
                 x => x.Timeout = TimeSpan.FromSeconds(1));
 
-        _fromFactoryWithErrorStateStore = stateStoreFactory.Create(User () => throw new InvalidOperationException("Something went wrong in this factory."));
+        _fromFactoryWithErrorStateStore = stateStoreFactory.Create(User () => throw new InvalidOperationException("Something went wrong in this factory.", new AggregateException("This is an inner exception.")));
     }
 
     private static User GetUser(int index = 0) => UserGenerator.Users.Skip(index).First();

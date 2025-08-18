@@ -1,0 +1,57 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using AlasdairCooper.Reference.Components.Utilities
+@using AlasdairCooper.Reference.Shared
+
+@inherits DefaultComponentBase
+
+@if (_authErrors.Any())
+{
+    <Alert Level="AlertLevel.Info">
+        <ul
+            class="@Class"
+            style="@Style"
+            attributes="@AdditionalAttributes">
+            @foreach (var error in _authErrors)
+            {
+                <li>
+                    @error
+                </li>
+            }
+        </ul>
+    </Alert>
+}
+
+@code {
+
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IAuthorizationPolicyProvider _policyProvider;
+
+    private List<string> _authErrors = [];
+
+    [Parameter]
+    [EditorRequired]
+    public required ClaimsPrincipal User { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public required IAuthorizeData AuthorizeData { get; set; }
+
+    [Parameter]
+    public object? Resource { get; set; }
+
+    public AuthorizationSummary(IAuthorizationService authorizationService, IAuthorizationPolicyProvider policyProvider)
+    {
+        _authorizationService = authorizationService;
+        _policyProvider = policyProvider;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var policy = await AuthorizationPolicy.CombineAsync(_policyProvider, [AuthorizeData]);
+        var res = await _authorizationService.AuthorizeAsync(User, Resource, policy!);
+
+        _authErrors = res.Failure?.FailureReasons.Select(x => x.Message).Concat(res.Failure?.FailedRequirements.Select(x => x.ToString()).WhereNotNull() ?? []).ToList() ?? [];
+    }
+
+}

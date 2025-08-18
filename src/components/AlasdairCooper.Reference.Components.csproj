@@ -23,9 +23,6 @@
       <Content Update="Inputs\Select.razor.css">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </Content>
-      <Content Update="Buttons\Button.razor.css">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </Content>
       <Content Update="Utilities\Spacer.razor.css">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </Content>

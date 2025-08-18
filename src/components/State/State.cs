@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AlasdairCooper.Reference.Components.State;
 
@@ -40,4 +41,4 @@ public sealed record ErrorState(Exception Exception) : State;
 
 public sealed record TimedOutState(Exception Exception, TimeSpan Timeout) : State;
 
-public sealed record UnauthorizedState(ClaimsPrincipal User);
+public sealed record UnauthorizedState(ClaimsPrincipal User, object? Resource, IAuthorizeData AuthorizeData);

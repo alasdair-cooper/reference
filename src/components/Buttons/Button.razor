@@ -1,12 +1,13 @@
-﻿@if (Href is not null)
+﻿@using AlasdairCooper.Reference.Components.Utilities
+@if (Href is not null)
 {
-    <a href="@Href">
+    <a href="@Href" disabled="@IsDisabled" style="--_color: @(Color.ToValidCssColor())">
         @ChildContent       
     </a>
 }
 else
 {
-    <button @onclick="OnClick">
+    <button @onclick="OnClick" disabled="@IsDisabled" style="--_color: @(Color.ToValidCssColor())">
         @ChildContent
     </button>
 }
@@ -26,4 +27,11 @@ else
     
     [Parameter]
     public RenderFragment? ChildContent { get => field ?? TextContent; set; }
+    
+    [Parameter]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
+
 }

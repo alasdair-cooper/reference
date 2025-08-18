@@ -1,0 +1,20 @@
+﻿@inherits DefaultComponentBase
+
+<div
+    class="@Class"
+    style="@Style"
+    @attributes="AdditionalAttributes"
+    data-level="@Level.ToIdent()">
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public AlertLevel Level { get; set; } = AlertLevel.Default;
+
+}

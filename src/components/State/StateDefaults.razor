@@ -1,4 +1,5 @@
 ﻿@using Humanizer
+@using AlasdairCooper.Reference.Components.Utilities
 
 @code {
 
@@ -8,15 +9,26 @@
 
         public static readonly RenderFragment<TimedOutState> TimedOut =
             x =>
-                @<span>Timed out after @x.Timeout.Humanize()</span>;
+                @<Alert Level="AlertLevel.Error">
+                    Timed out after @x.Timeout.Humanize()
+                </Alert>;
 
         public static readonly RenderFragment<ErrorState> Error =
             x =>
-                @<span>An error occured: @x.Exception.Message</span>;
+                @<ErrorSummary Exception="x.Exception" />;
 
-        public static readonly RenderFragment<NotFoundState> NotFound = _ => @<span>Item not found.</span>;
+        public static readonly RenderFragment<NotFoundState> NotFound =
+            _ =>
+                @<Alert Level="AlertLevel.Warning">
+                    Item not found.
+                </Alert>;
 
-        public static readonly RenderFragment<UnauthorizedState> Unauthorized = _ => @<span>Unauthorized.</span>;
+        public static readonly RenderFragment<UnauthorizedState> Unauthorized =
+            x =>
+                @<AuthorizationSummary
+                    User="x.User"
+                    Resource="x.Resource"
+                    AuthorizeData="x.AuthorizeData" />;
     }
 
 }

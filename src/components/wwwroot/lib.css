@@ -1,20 +1,43 @@
-﻿:root {
+﻿@function --box-shadow(--depth, --color) {
+    result: var(--depth) var(--depth) var(--color), 
+        calc(var(--depth) * 0.75) calc(var(--depth) * 0.75) var(--color),
+        calc(var(--depth) * 0.5) calc(var(--depth) * 0.5) var(--color),
+        calc(var(--depth) * 0.25) calc(var(--depth) * 0.25) var(--color);
+}
+
+:root {
     --theme: light;
     color-scheme: var(--theme);
-
-    @media (prefers-color-scheme: dark){
+    
+    --black: hsl(0 0 30);
+    
+    --key-default: var(--black);
+    --key-info: hsl(200 100 20);
+    --key-success: hsl(120 100 20);
+    --key-warning: hsl(40 100 30);
+    --key-error: hsl(0 100 20);
+    
+    --shade-depth: 0.25rem;
+    --shade-depth-hover: calc(var(--shade-depth) * 1.25);
+    --shade-depth-active: calc(var(--shade-depth) * 0.75);
+    
+    @media (prefers-color-scheme: dark) {
         --theme: dark;
     }
 }
 
-:root:has(#theme [data-theme="light"]:checked){
+:root:has(#theme [data-theme="light"]:checked) {
     --theme: light;
 }
 
-:root:has(#theme [data-theme="dark"]:checked){
+:root:has(#theme [data-theme="dark"]:checked) {
     --theme: dark;
 }
 
 * {
     font-family: system-ui;
+}
+
+pre, code {
+    font-family: monospace;
 }

@@ -2,12 +2,28 @@
 
 @page "/buttons"
 
-<Button Href="#">Link</Button>
+<div style="display: flex; flex-wrap: wrap; gap: 1rem">
+    <Button Href="/buttons">Link</Button>
+    <Button OnClick="_onClick">
+        Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        IsDisabled="true">
+        Disabled Button
+    </Button>
+    <Button OnClick="_onClick">
+        Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        IsDisabled="true">
+        Disabled Button
+    </Button>
+</div>
 
-<Button OnClick="() => { }">Button</Button>
 
 @code {
 
-    
-
+    private readonly Action _onClick = () => { };
 }

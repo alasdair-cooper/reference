@@ -1,5 +1,6 @@
 ﻿@inherits DefaultComponentBase
 
+@using AlasdairCooper.Reference.Components.Utilities
 @typeparam T
 
 @attribute [CascadingTypeParameter(nameof(T))]
@@ -56,6 +57,9 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+    
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
 
     protected override void OnParametersSet() => SetSelectedIndexForValue();
 
