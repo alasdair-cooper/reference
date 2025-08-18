@@ -4,17 +4,15 @@ public abstract record Color
 {
     public abstract string ToValidCssColor();
 
-    public static readonly Color Default = new DefaultColor();
+    public static readonly Color Default = new VarColor("");
 
-    private record DefaultColor : Color
-    {
-        public override string ToValidCssColor() => "";
-    }
+    public static implicit operator Color(AlertLevel level) => level.ToColor();
 }
 
 public record VarColor(string VariableName) : Color
 {
     public override string ToValidCssColor() => $"var({VariableName})";
+    
 }
 
 public record RgbaColor(int Red, int Green, int Blue, double Alpha) : Color

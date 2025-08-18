@@ -13,7 +13,7 @@
     text-align: center;
     color: var(--_color);
     border: 0.125rem solid var(--_color);
-    box-shadow: --box-shadow(var(--_shade-depth, var(--shade-depth)), var(--_color));
+    box-shadow: --box-shadow(var(--_shade-depth), var(--_color));
     translate: calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth))) calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth)));
     border-radius: 0.5rem;
     transition: box-shadow 200ms ease-in-out, translate 200ms ease-in-out;
@@ -28,6 +28,9 @@
 }
 
 :is(button, a)[disabled] {
-    color: hsl(from var(--_color) h 0 50);
+    --_disabled-color: hsl(from var(--_color) h 0 50);
+    color: var(--_disabled-color);
+    border: 0.125rem solid var(--_disabled-color);
+    box-shadow: --box-shadow(var(--_shade-depth), var(--_disabled-color));
     pointer-events: none;
 }
