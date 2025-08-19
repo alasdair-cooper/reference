@@ -13,7 +13,9 @@
     @bind-Page="_query.Page"
     @bind-PageSize="_query.PageSize"
     Parameters="_query"
-    Store="_userStore">
+    Store="_userStore"
+    T="UserDto"
+    TParameters="UserQuery">
     <Column
         Title="First Name"
         Property="x => x.FirstName" />

@@ -10,7 +10,7 @@ public static class Extensions
         return services;
     }
     
-    public static IServiceCollection AddDialogsSingleton(this IServiceCollection services)
+    public static IServiceCollection AddDialogsAsSingleton(this IServiceCollection services)
     {
         services.AddSingleton<DialogService>();
         return services;

@@ -72,7 +72,7 @@
         get;
         set
         {
-            if (_hasLoadedAtLeastOnce && ((field == null && value == null) || (field != null && field.Equals(value)))) return;
+            if (_hasLoadedAtLeastOnce && ((field is null && value is null) || (field is not null && field.Equals(value)))) return;
             _hasLoadedAtLeastOnce = true;
             field = value;
             LoadStoreWithStateHandler(field);

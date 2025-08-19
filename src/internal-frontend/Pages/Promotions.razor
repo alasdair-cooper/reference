@@ -1,4 +1,5 @@
-﻿@using AlasdairCooper.Reference.Shared.Api
+﻿@using AlasdairCooper.Reference.Components.State
+@using AlasdairCooper.Reference.Shared.Api
 
 @page "/promotions"
 
@@ -8,9 +9,7 @@
 
 <h1>Promotions</h1>
 
-<Table
-    Parameters="new object()"
-    DataProvider="async Task<(IEnumerable<PromotionDto>, int)> (_) => (await _client.ListPromotionsAsync(), 100)">
+<Table Store="_state">
     <Column
         Title="Name"
         Property="x => x.DisplayName" />
@@ -28,8 +27,12 @@
 
 @code {
 
-    private readonly ApiClient _client;
+    private readonly StateStore<TableData<PromotionDto>> _state;
 
-    public Promotions(ApiClient client) => _client = client;
+    public Promotions(ApiClient client, StateStoreFactory stateStoreFactory) => _state = stateStoreFactory.Create(async x =>
+    {
+        var promotions = await client.ListPromotionsAsync(x);
+        return new TableData<PromotionDto>(promotions, promotions.Count);
+    });
 
 }
