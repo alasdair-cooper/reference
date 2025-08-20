@@ -2,14 +2,14 @@
 
 namespace AlasdairCooper.Reference.Api.Data.Entities.Stocking;
 
-public sealed class Bin(int id) : ILocatable
+public sealed class Bin(int id, string name) : ILocatable
 {
-    public int Id { get; private set; } = id;
+    public int Id { get; init; } = id;
 
     [StringLength(10)]
-    public string Name { get; private set; } = null!;
+    public string Name { get; private set; } = name;
 
-    public Sku Sku { get; init; } = null!;
+    public Sku Sku { get; private set; } = null!;
 
     public List<Stock> Stock { get; init; } = null!;
 
@@ -19,11 +19,15 @@ public sealed class Bin(int id) : ILocatable
 
     public string Key => Name;
 
-    public void AddStock(params IEnumerable<Stock> stock) => Stock.AddRange(stock);
+    public void AddStock(Sku sku, params IEnumerable<Stock> stock)
+    {
+        Sku = sku;
+        Stock.AddRange(stock);
+    }
 
     public void TransferStockTo(Bin bin)
     {
-        bin.AddStock(Stock);
+        bin.AddStock(Sku, Stock);
         Stock.Clear();
     }
 }

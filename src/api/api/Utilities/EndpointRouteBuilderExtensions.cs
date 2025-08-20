@@ -8,7 +8,7 @@ public static class EndpointRouteBuilderExtensions
     {
         builder.MapOpenApi();
         // See https://github.com/dotnet/aspnetcore/issues/57332#issuecomment-2480939916
-        builder.MapScalarApiReference(x => x.Servers = []);
+        builder.MapScalarApiReference(static x => x.Servers = []);
 
         return builder;
     }

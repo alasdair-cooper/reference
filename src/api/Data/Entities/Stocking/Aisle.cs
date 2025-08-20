@@ -2,12 +2,12 @@
 
 namespace AlasdairCooper.Reference.Api.Data.Entities.Stocking;
 
-public sealed class Aisle(int id) : ILocatable
+public sealed class Aisle(int id, string name) : ILocatable
 {
-    public int Id { get; private set; } = id;
+    public int Id { get; init; } = id;
 
     [StringLength(10)]
-    public string Name { get; private set; } = null!;
+    public string Name { get; private set; } = name;
 
     public List<Rack> Racks { get; init; } = null!;
 

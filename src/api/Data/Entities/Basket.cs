@@ -2,7 +2,7 @@
 
 public sealed class Basket(int id)
 {
-    public int Id { get; init; }
+    public int Id { get; init; } = id;
 
     public List<BasketItem> Items { get; init; } = null!;
 }

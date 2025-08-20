@@ -19,7 +19,6 @@ public class MigrationWorker(IServiceProvider serviceProvider, IHostApplicationL
             var dbContext = scope.ServiceProvider.GetRequiredService<ReferenceDbContext>();
 
             await RunMigrationAsync(dbContext, cancellationToken);
-            await SeedDataAsync(dbContext, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -38,20 +37,5 @@ public class MigrationWorker(IServiceProvider serviceProvider, IHostApplicationL
             (dbContext, cancellationToken),
                 // Run migration in a transaction to avoid partial migration if it fails.
             static async state => await state.dbContext.Database.MigrateAsync(state.cancellationToken));
-    }
-
-    private static async Task SeedDataAsync(ReferenceDbContext dbContext, CancellationToken cancellationToken)
-    {
-        var strategy = dbContext.Database.CreateExecutionStrategy();
-
-        await strategy.ExecuteAsync(
-            (dbContext, cancellationToken),
-            static async state =>
-            {
-                await using var transaction = await state.dbContext.Database.BeginTransactionAsync(state.cancellationToken);
-                await state.dbContext.SeedDataAsync(state.cancellationToken);
-                await state.dbContext.SaveChangesAsync(state.cancellationToken);
-                await transaction.CommitAsync(state.cancellationToken);
-            });
     }
 }

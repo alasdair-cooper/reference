@@ -21,7 +21,7 @@ public static class ItemsApi
 
         items.MapGet(
             "/",
-            async (
+            static async (
                 int page,
                 int pageSize,
                 string? nameFilter,
@@ -40,7 +40,7 @@ public static class ItemsApi
 
                 var skus =
                     context.Skus.Where(x => nameFilter == null || Regex.IsMatch(x.DisplayName, nameFilter))
-                        .Where(x => (includeOutOfStock != null && includeOutOfStock.Value) || x.Bins.SelectMany(x => x.Stock).Any());
+                        .Where(x => (includeOutOfStock != null && includeOutOfStock.Value) || x.Bins.SelectMany(static x => x.Stock).Any());
 
                 var totalCount = await skus.CountAsync(cancellationToken);
 
@@ -54,13 +54,13 @@ public static class ItemsApi
                         await skus.OrderBy(
                                 sortField switch
                                 {
-                                    ItemSortableField.DisplayName or null => x => x.DisplayName,
-                                    ItemSortableField.SuggestedPrice => x => x.SuggestedPrice,
+                                    ItemSortableField.DisplayName or null => static x => x.DisplayName,
+                                    ItemSortableField.SuggestedPrice => static x => x.SuggestedPrice,
                                     _ => throw new UnreachableException()
                                 },
                                 sortDirection ?? SortDirection.Ascending)
                             .Select(
-                                x =>
+                                static x =>
                                 new
                                 {
                                     x.Id,
@@ -70,7 +70,7 @@ public static class ItemsApi
                                     x.KeyPoints,
                                     x.Tags,
                                     x.Media,
-                                    StockCount = x.Bins.SelectMany(x => x.Stock).Count()
+                                    StockCount = x.Bins.SelectMany(static x => x.Stock).Count()
                                 })
                             .Skip((page - 1) * pageSize)
                             .Take(pageSize)
@@ -78,24 +78,24 @@ public static class ItemsApi
 
                     var currentDate = timeProvider.GetUtcNow();
 
-                    var skuIds = pagedSkus.Select(x => x.Id).ToList();
+                    var skuIds = pagedSkus.Select(static x => x.Id).ToList();
 
                     var skuDiscounts =
                         await context.Promotions.Where(x => x.StartDate == null || x.StartDate < currentDate)
                             .Where(x => x.EndDate == null || currentDate < x.EndDate)
-                            .SelectMany(x => x.Discounts)
+                            .SelectMany(static x => x.Discounts)
                             .OfType<SkuDiscount>()
-                            .Include(x => x.Strategy)
+                            .Include(static x => x.Strategy)
                             .Include(x => x.Skus.Where(x => skuIds.Contains(x.Id)))
                             .ToListAsync(cancellationToken);
 
                     var tagDiscounts =
                         await context.Promotions.Where(x => x.StartDate == null || x.StartDate < currentDate)
                             .Where(x => x.EndDate == null || currentDate < x.EndDate)
-                            .SelectMany(x => x.Discounts)
+                            .SelectMany(static x => x.Discounts)
                             .OfType<TagDiscount>()
-                            .Include(x => x.Strategy)
-                            .Include(x => x.Tags)
+                            .Include(static x => x.Strategy)
+                            .Include(static x => x.Tags)
                             .ThenInclude(x => x.Skus.Where(x => skuIds.Contains(x.Id)))
                             .ToListAsync(cancellationToken);
 
@@ -121,14 +121,14 @@ public static class ItemsApi
                             discountedPrice ?? sku.SuggestedPrice,
                             sku.SuggestedPrice,
                             sku.StockCount < 10 ? sku.StockCount : null,
-                            discounts.Select(x => x.Strategy.ToDisplayString()).ToArray(),
+                            discounts.Select(static x => x.Strategy.ToDisplayString()).ToArray(),
                             sku.Media.Select(x => linkGenerator.GetUriByName(httpContext, MediaConstants.EndpointNames.GetMedia, new { x.Id }))
                                 .WhereNotNull()
                                 .ToArray(),
-                            sku.Tags.Select(x => x.Name).ToArray());
+                            sku.Tags.Select(static x => x.Name).ToArray());
                     }
                 }
-            });
+            }).CacheOutput();
 
         return builder;
     }

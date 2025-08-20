@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using AlasdairCooper.Reference.Api.Data;
 using AlasdairCooper.Reference.Api.Features.Content;
 using AlasdairCooper.Reference.Api.Features.Discounts;
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 builder.AddNpgsqlDbContext<ReferenceDbContext>(AspireConstants.Resources.Database);
 builder.AddCorsForClient(AspireConstants.Resources.InternalFrontend);
+builder.AddRedisOutputCache(AspireConstants.Resources.Cache);
 
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
@@ -22,7 +24,11 @@ builder.Services.AddMedia();
 builder.Services.AddPromotions();
 builder.Services.AddUsers();
 
-builder.Services.ConfigureHttpJsonOptions(x => x.SerializerOptions.Converters.Add(new MoneyJsonConverter()));
+builder.Services.ConfigureHttpJsonOptions(static x =>
+{
+    x.SerializerOptions.Converters.Add(new MoneyJsonConverter());
+    x.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 var app = builder.Build();
 
@@ -40,7 +46,8 @@ app.MapPromotionsEndpoints();
 app.MapUsersEndpoints();
 
 app.UseCors();
-app.UseStatusCodePages();
 app.UseExceptionHandler();
+app.UseOutputCache();
+app.UseStatusCodePages();
 
 app.Run();

@@ -1,6 +1,6 @@
 ﻿namespace AlasdairCooper.Reference.Shared.Orchestration;
 
-public class AspireConstants
+public static class AspireConstants
 {
     public static class Resources
     {
@@ -11,5 +11,6 @@ public class AspireConstants
         public const string ExternalFrontend = "external-frontend";
         public const string DatabaseServer = "postgres-server";
         public const string Database = "postgres-db";
+        public const string Cache = "cache";
     }
 }

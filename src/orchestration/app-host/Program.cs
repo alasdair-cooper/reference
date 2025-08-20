@@ -12,14 +12,21 @@ var internalFrontend =
 var passwordParam = builder.AddParameter("db-password", true);
 
 var dbServer = builder.AddPostgres(AspireConstants.Resources.DatabaseServer).WithPassword(passwordParam).WithDataVolume(isReadOnly: false);
+var db = dbServer.AddDatabase(AspireConstants.Resources.Database);
 
-var db = dbServer.AddDatabase(AspireConstants.Resources.Database);;
+var cache = builder.AddGarnet(AspireConstants.Resources.Cache);
 
 migrator.WithReference(db).WaitFor(db);
 
 generator.WithReference(db).WaitFor(db).WithExplicitStart();
 
-api.WithReference(internalFrontend).WithReference(migrator).WaitForCompletion(migrator).WithReference(db).WaitFor(db);
+api.WithReference(internalFrontend)
+    .WithReference(migrator)
+    .WaitForCompletion(migrator)
+    .WithReference(db)
+    .WaitFor(db)
+    .WithReference(cache)
+    .WaitFor(cache);
 
 internalFrontend.WithReference(api).WaitFor(api);
 
