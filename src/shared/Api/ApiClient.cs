@@ -16,4 +16,14 @@ public class ApiClient(HttpClient httpClient)
         var totalCount = int.Parse(res.Headers.GetValues("X-Total-Count").Single());
         return (users, totalCount);
     }
+    
+    public async Task<(List<ItemDto>, int)>
+        ListItemsAsync(int page, int pageSize, string? nameFilter = null, CancellationToken cancellationToken = default)
+    {
+        var res = await httpClient.GetAsync($"items?page={page}&pageSize={pageSize}&nameFilter={nameFilter}", cancellationToken);
+        res.EnsureSuccessStatusCode();
+        var items = await res.Content.ReadFromJsonAsync<List<ItemDto>>(cancellationToken) ?? throw new InvalidOperationException();
+        var totalCount = int.Parse(res.Headers.GetValues("X-Total-Count").Single());
+        return (items, totalCount);
+    }
 }

@@ -3,10 +3,9 @@ using AlasdairCooper.Reference.Api.Data;
 using AlasdairCooper.Reference.Api.Data.Entities;
 using AlasdairCooper.Reference.Api.Data.Entities.Discounts;
 using AlasdairCooper.Reference.Api.Data.Entities.DiscountStrategies;
-using AlasdairCooper.Reference.Api.Features.Media;
+using AlasdairCooper.Reference.Api.Features.Content;
 using AlasdairCooper.Reference.Shared;
 using AlasdairCooper.Reference.Shared.Api;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AlasdairCooper.Reference.Api.Features.Promotions;
@@ -90,7 +89,7 @@ internal static class PromotionsApi
                             });
 
                 var media =
-                    await context.Files.OfType<Data.Entities.Media.Media>()
+                    await context.Files.OfType<Data.Entities.Content.Media>()
                         .Where(x => request.MediaIds.Contains(x.Id))
                         .ToListAsync(cancellationToken);
 

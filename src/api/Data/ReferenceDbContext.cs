@@ -1,13 +1,15 @@
 using AlasdairCooper.Reference.Api.Data.Entities;
 using AlasdairCooper.Reference.Api.Data.Entities.Addresses;
+using AlasdairCooper.Reference.Api.Data.Entities.Content;
 using AlasdairCooper.Reference.Api.Data.Entities.Discounts;
 using AlasdairCooper.Reference.Api.Data.Entities.DiscountStrategies;
-using AlasdairCooper.Reference.Api.Data.Entities.Media;
+using AlasdairCooper.Reference.Api.Data.Entities.Ordering;
+using AlasdairCooper.Reference.Api.Data.Entities.Stocking;
 using AlasdairCooper.Reference.Api.Data.Entities.Users;
 using AlasdairCooper.Reference.Api.Data.Utilities;
 using AlasdairCooper.Reference.Shared.Common;
 using Microsoft.EntityFrameworkCore;
-using File = AlasdairCooper.Reference.Api.Data.Entities.Media.File;
+using File = AlasdairCooper.Reference.Api.Data.Entities.Content.File;
 
 namespace AlasdairCooper.Reference.Api.Data;
 
@@ -45,6 +47,30 @@ public class ReferenceDbContext(DbContextOptions<ReferenceDbContext> options) : 
 
     public DbSet<File> Files { get; set; } = null!;
 
+    #endregion
+
+    #region Stock
+
+    public DbSet<Stock> Stock { get; set; } = null!;
+    
+    public DbSet<Bin> Bins { get; set; } = null!;
+    
+    public DbSet<Rack> Racks { get; set; } = null!;
+    
+    public DbSet<Aisle> Aisles { get; set; } = null!;
+    
+    public DbSet<Warehouse> Warehouses { get; set; } = null!;
+    
+    public DbSet<DistributionCenter> DistributionCenters { get; set; } = null!;
+    
+    #endregion
+    
+    #region Ordering
+    
+    public DbSet<Order> Orders { get; set; } = null!;
+    
+    public DbSet<Dispatch> Dispatches { get; set; } = null!;
+    
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -133,15 +159,15 @@ public class ReferenceDbContext(DbContextOptions<ReferenceDbContext> options) : 
         Add(paintsDiscount);
 
         Promotions.RemoveRange(Promotions);
-
+        
         var summerSale =
             new Promotion(
                 0,
                 "summer-sale",
                 "Summer Sale",
                 "Get 5% off all Space Marines and buy 1 get 1 free on a selection of paints",
-                new DateTimeOffset(2025, 8, 1, 0, 0, 0, TimeSpan.Zero),
-                new DateTimeOffset(2025, 8, 1, 0, 0, 0, TimeSpan.Zero)) { Discounts = [spaceMarinesDiscount, paintsDiscount] };
+                DateTimeOffset.Now.AddMonths(-1),
+                DateTimeOffset.Now.AddMonths(1)) { Discounts = [spaceMarinesDiscount, paintsDiscount] };
 
         Add(summerSale);
     }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using AlasdairCooper.Reference.InternalFrontend;
 using AlasdairCooper.Reference.Shared.Api;
-using AlasdairCooper.Reference.Shared.Orchestration;
 using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -22,7 +21,8 @@ builder.Services.AddSingleton<AuthenticationStateProvider, NoAuthAuthenticationS
 
 builder.AddServiceDefaults();
 
-builder.Services.AddHttpClient<ApiClient>(static x => x.BaseAddress = new Uri($"https+http://{AspireConstants.Resources.Api}"));
+// builder.Services.AddHttpClient<ApiClient>(static x => x.BaseAddress = new Uri($"https+http://{AspireConstants.Resources.Api}"));
+builder.Services.AddHttpClient<ApiClient>(static x => x.BaseAddress = new Uri("https://localhost:7101"));
 
 var app = builder.Build();
 
@@ -30,5 +30,6 @@ await app.RunAsync();
 
 internal sealed class NoAuthAuthenticationStateProvider : AuthenticationStateProvider
 {
-    public override Task<AuthenticationState> GetAuthenticationStateAsync() => Task.FromResult<AuthenticationState>(new(new ClaimsPrincipal(new ClaimsIdentity([], "no_auth"))));
+    public override Task<AuthenticationState> GetAuthenticationStateAsync() =>
+        Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity([], "no_auth"))));
 }

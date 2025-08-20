@@ -1,14 +1,15 @@
 ﻿using System.Diagnostics;
+using System.Linq.Expressions;
 using AlasdairCooper.Reference.Shared.Common;
 
-namespace AlasdairCooper.Reference.Components.Tables;
+namespace AlasdairCooper.Reference.Api.Utilities;
 
-public static class Extensions
+public static class QueryableExtensions
 {
-    public static IOrderedEnumerable<TSource> OrderByDirection<TSource>(
-        this IEnumerable<TSource> source,
-        SortDirection direction,
-        Func<TSource, object?> keySelector) =>
+    public static IOrderedQueryable<TSource> OrderBy<TSource>(
+        this IQueryable<TSource> source,
+        Expression<Func<TSource, object?>> keySelector,
+        SortDirection direction) =>
         direction switch
         {
             SortDirection.Ascending => source.OrderBy(keySelector),

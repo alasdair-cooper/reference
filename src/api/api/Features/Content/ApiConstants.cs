@@ -1,4 +1,4 @@
-﻿namespace AlasdairCooper.Reference.Api.Features.Media;
+﻿namespace AlasdairCooper.Reference.Api.Features.Content;
 
 public static class MediaConstants
 {

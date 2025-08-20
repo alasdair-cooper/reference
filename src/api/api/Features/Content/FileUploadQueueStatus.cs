@@ -1,3 +1,3 @@
-﻿namespace AlasdairCooper.Reference.Api.Features.Media;
+﻿namespace AlasdairCooper.Reference.Api.Features.Content;
 
 internal sealed record FileUploadQueueStatus(int Count, UploadedMediaLog[] RecentlyUploaded);

@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AlasdairCooper.Reference.Api.Data.Entities.Content;
+using AlasdairCooper.Reference.Api.Data.Entities.Stocking;
 using AlasdairCooper.Reference.Api.Data.Utilities;
 using AlasdairCooper.Reference.Shared.Common;
 
@@ -19,4 +21,8 @@ public sealed class Sku(int id, string displayName, string[] keyPoints, string? 
     public Money SuggestedPrice { get; init; } = suggestedPrice;
 
     public List<Tag> Tags { get; init; } = null!;
+    
+    public List<Bin> Bins { get; init; } = null!;
+
+    public List<Media> Media { get; init; } = null!;
 }

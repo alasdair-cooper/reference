@@ -3,20 +3,20 @@ using AlasdairCooper.Reference.Api.Data;
 using AlasdairCooper.Reference.Api.Utilities;
 using Microsoft.EntityFrameworkCore;
 
-namespace AlasdairCooper.Reference.Api.Features.Media;
+namespace AlasdairCooper.Reference.Api.Features.Content;
 
-internal static class MediaApi
+internal static class ContentApi
 {
-    public static IEndpointRouteBuilder MapMediaEndpoints(this IEndpointRouteBuilder builder)
+    public static IEndpointRouteBuilder MapContentEndpoints(this IEndpointRouteBuilder builder)
     {
-        var media = builder.MapGroup("/media").WithTags("Media");
+        var content = builder.MapGroup("/content").WithTags("Content");
 
-        media.MapGet(
+        content.MapGet(
                 "/{id:int}",
                 async (int id, ReferenceDbContext context, CancellationToken cancellationToken) =>
                 {
                     var media =
-                        await context.Files.OfType<Data.Entities.Media.Media>()
+                        await context.Files.OfType<Data.Entities.Content.Media>()
                             .Where(x => x.Id == id)
                             .Select(x => new { x.MediaType, x.Data })
                             .SingleOrDefaultAsync(cancellationToken);
@@ -25,7 +25,7 @@ internal static class MediaApi
                 })
             .WithName(MediaConstants.EndpointNames.GetMedia);
 
-        media.MapPost(
+        content.MapPost(
                 "/",
                 async (
                     IFormFileCollection files,
@@ -43,7 +43,7 @@ internal static class MediaApi
                 })
             .DisableAntiforgery();
 
-        media.MapGet(
+        content.MapGet(
                 "/upload-queue/status",
                 (Channel<PendingMediaUpload> fileUploadQueue, Channel<UploadedMediaLog> logQueue) =>
                     Results.Ok(new FileUploadQueueStatus(fileUploadQueue.Reader.Count, logQueue.Reader.TryPeek(out var log) ? [log] : [])))

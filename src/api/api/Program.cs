@@ -1,6 +1,7 @@
 using AlasdairCooper.Reference.Api.Data;
+using AlasdairCooper.Reference.Api.Features.Content;
 using AlasdairCooper.Reference.Api.Features.Discounts;
-using AlasdairCooper.Reference.Api.Features.Media;
+using AlasdairCooper.Reference.Api.Features.Items;
 using AlasdairCooper.Reference.Api.Features.Promotions;
 using AlasdairCooper.Reference.Api.Features.Users;
 using AlasdairCooper.Reference.Api.Utilities;
@@ -33,7 +34,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapDiscountsEndpoints();
-app.MapMediaEndpoints();
+app.MapItemsEndpoints();
+app.MapContentEndpoints();
 app.MapPromotionsEndpoints();
 app.MapUsersEndpoints();
 

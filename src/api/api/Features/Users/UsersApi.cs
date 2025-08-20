@@ -8,9 +8,9 @@ namespace AlasdairCooper.Reference.Api.Features.Users;
 
 public static class UsersApi
 {
-    public static IEndpointRouteBuilder MapUsersEndpoints(this IEndpointRouteBuilder endpoints)
+    public static IEndpointRouteBuilder MapUsersEndpoints(this IEndpointRouteBuilder builder)
     {
-        var users = endpoints.MapGroup("/users").WithTags("Users");
+        var users = builder.MapGroup("/users").WithTags("Users");
 
         users.MapGet(
             "/",
@@ -43,6 +43,6 @@ public static class UsersApi
                 return TypedResults.Ok(users);
             });
 
-        return endpoints;
+        return builder;
     }
 }

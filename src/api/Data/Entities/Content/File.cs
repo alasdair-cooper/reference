@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AlasdairCooper.Reference.Api.Data.Entities.Media;
+namespace AlasdairCooper.Reference.Api.Data.Entities.Content;
 
 public class File(int id, string name, byte[] data)
 {

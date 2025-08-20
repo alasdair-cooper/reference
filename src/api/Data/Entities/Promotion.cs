@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using AlasdairCooper.Reference.Api.Data.Entities.Content;
 using AlasdairCooper.Reference.Api.Data.Entities.Discounts;
 
 namespace AlasdairCooper.Reference.Api.Data.Entities;
@@ -22,5 +23,5 @@ public sealed class Promotion(int id, string name, string displayName, string de
 
     public List<Discount> Discounts { get; init; } = null!;
 
-    public List<Media.Media> Media { get; init; } = null!;
+    public List<Media> Media { get; init; } = null!;
 }

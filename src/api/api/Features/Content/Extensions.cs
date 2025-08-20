@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
 
-namespace AlasdairCooper.Reference.Api.Features.Media;
+namespace AlasdairCooper.Reference.Api.Features.Content;
 
 internal static class Extensions
 {

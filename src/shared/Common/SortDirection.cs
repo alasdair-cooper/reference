@@ -1,4 +1,4 @@
-﻿namespace AlasdairCooper.Reference.Components.Tables;
+﻿namespace AlasdairCooper.Reference.Shared.Common;
 
 public enum SortDirection
 {
