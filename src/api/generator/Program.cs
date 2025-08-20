@@ -1,5 +1,6 @@
 using AlasdairCooper.Reference.Api.Data;
 using AlasdairCooper.Reference.Api.Generator;
+using AlasdairCooper.Reference.Orchestration.ServiceDefaults;
 using AlasdairCooper.Reference.Shared.Orchestration;
 
 var builder = Host.CreateApplicationBuilder(args);

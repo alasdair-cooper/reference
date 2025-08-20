@@ -11,7 +11,9 @@ var internalFrontend =
 
 var passwordParam = builder.AddParameter("db-password", true);
 
-var dbServer = builder.AddPostgres(AspireConstants.Resources.DatabaseServer).WithPassword(passwordParam).WithDataVolume(isReadOnly: false);
+var dbServer =
+    builder.AddPostgres(AspireConstants.Resources.DatabaseServer).WithPassword(passwordParam).WithDataVolume(isReadOnly: false).WithHostPort(58501);
+
 var db = dbServer.AddDatabase(AspireConstants.Resources.Database);
 
 var cache = builder.AddGarnet(AspireConstants.Resources.Cache);

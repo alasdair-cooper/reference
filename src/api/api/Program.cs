@@ -6,6 +6,7 @@ using AlasdairCooper.Reference.Api.Features.Items;
 using AlasdairCooper.Reference.Api.Features.Promotions;
 using AlasdairCooper.Reference.Api.Features.Users;
 using AlasdairCooper.Reference.Api.Utilities;
+using AlasdairCooper.Reference.Orchestration.ServiceDefaults;
 using AlasdairCooper.Reference.Shared.Common;
 using AlasdairCooper.Reference.Shared.Orchestration;
 
