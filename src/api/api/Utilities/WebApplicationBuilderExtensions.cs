@@ -8,7 +8,10 @@ public static class WebApplicationBuilderExtensions
             x =>
                 x.AddDefaultPolicy(
                     x =>
-                        x.WithOrigins(builder.Configuration.GetServiceEndpoints(connectionName)).AllowAnyMethod().WithExposedHeaders("X-Total-Count")));
+                        x.WithOrigins(builder.Configuration.GetServiceEndpoints(connectionName))
+                            .WithOrigins("http://localhost:8080")
+                            .AllowAnyMethod()
+                            .WithExposedHeaders("X-Total-Count")));
 
         return builder;
     }
