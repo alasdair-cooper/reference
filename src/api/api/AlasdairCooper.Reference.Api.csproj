@@ -7,8 +7,10 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.4.0" />
+    <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="9.4.1" />
     <PackageReference Include="Aspire.StackExchange.Redis.OutputCaching" Version="9.4.1" />
     <PackageReference Include="Aspire4Wasm.WebApi" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
     <PackageReference Include="Scalar.AspNetCore.Microsoft" Version="2.6.1" />
   </ItemGroup>
 

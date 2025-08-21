@@ -16,9 +16,11 @@ builder.AddServiceDefaults();
 builder.AddNpgsqlDbContext<ReferenceDbContext>(AspireConstants.Resources.Database);
 builder.AddCorsForClient(AspireConstants.Resources.InternalFrontend);
 builder.AddRedisOutputCache(AspireConstants.Resources.Cache);
+builder.AddRedisDistributedCache(AspireConstants.Resources.Cache);
 
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddSession();
 
 builder.Services.AddDiscounts();
 builder.Services.AddMedia();
@@ -50,5 +52,6 @@ app.UseCors();
 app.UseExceptionHandler();
 app.UseOutputCache();
 app.UseStatusCodePages();
+app.UseSession();
 
 app.Run();
