@@ -11,7 +11,9 @@ public static class WebApplicationBuilderExtensions
                         x.WithOrigins(builder.Configuration.GetServiceEndpoints(connectionName))
                             .WithOrigins("http://localhost:8080")
                             .AllowAnyMethod()
-                            .WithExposedHeaders("X-Total-Count")));
+                            .AllowCredentials()
+                            .WithHeaders("content-type")
+                            .WithExposedHeaders("X-Total-Count", "content-type")));
 
         return builder;
     }

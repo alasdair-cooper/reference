@@ -16,7 +16,7 @@ var dbServer =
 
 var db = dbServer.AddDatabase(AspireConstants.Resources.Database);
 
-var cache = builder.AddGarnet(AspireConstants.Resources.Cache);
+var cache = builder.AddRedis(AspireConstants.Resources.Cache);
 
 migrator.WithReference(db).WaitFor(db);
 
@@ -30,6 +30,6 @@ api.WithReference(internalFrontend)
     .WithReference(cache)
     .WaitFor(cache);
 
-internalFrontend.WithReference(api).WaitFor(api);
+internalFrontend.WithReference(api).WaitFor(api).WithExplicitStart();
 
 builder.Build().Run();

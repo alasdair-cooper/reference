@@ -77,7 +77,12 @@ public class ReferenceDbContext(DbContextOptions<ReferenceDbContext> options) : 
         modelBuilder.HasPostgresExtension(DatabaseConstants.PostgresExtensions.FuzzyStringMatch);
         modelBuilder.HasPostgresExtension(DatabaseConstants.PostgresExtensions.Trigrams);
         
-        modelBuilder.Entity<User>(static x => { x.HasDiscriminator().HasValue<AnonymousUser>("anon").HasValue<AuthenticatedUser>("known"); });
+        modelBuilder.Entity<User>(
+            static x =>
+            {
+                x.HasDiscriminator().HasValue<AnonymousUser>("anon").HasValue<AuthenticatedUser>("known");
+                x.HasOne(static x => x.Basket).WithOne(static x => x.User).HasForeignKey<Basket>();
+            });
 
         modelBuilder.Entity<AuthenticatedUser>(
             static x =>
