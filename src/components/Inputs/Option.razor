@@ -1,0 +1,26 @@
+﻿@inherits DefaultComponentBase
+
+@typeparam T
+
+@code {
+
+    [Parameter]
+    public T Value { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    
+    [CascadingParameter]
+    public Select<T>? Select { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Select is null)
+        {
+            throw new InvalidOperationException($"{nameof(Option<>)} must be used within a {nameof(Select<>)} component.");
+        }
+        
+        Select.RegisterOption(this);
+    }
+
+}

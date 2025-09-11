@@ -1,0 +1,36 @@
+﻿button, a {
+    --_color: currentColor;
+    display: inline-block;
+    background: transparent;
+    text-decoration: none;
+    font-size: 1em;
+    cursor: pointer;
+    text-box-edge: cap alphabetic;
+    text-box-trim: trim-both;
+    box-sizing: border-box;
+    min-width: 6rem;
+    padding: 0.5rem 1rem;
+    text-align: center;
+    color: var(--_color);
+    border: 0.125rem solid var(--_color);
+    box-shadow: --box-shadow(var(--_shade-depth), var(--_color));
+    translate: calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth))) calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth)));
+    border-radius: 0.5rem;
+    transition: box-shadow 200ms ease-in-out, translate 200ms ease-in-out;
+}
+
+:is(button, a):hover {
+    --_shade-depth: var(--shade-depth-hover);
+}
+
+:is(button, a):active {
+    --_shade-depth: var(--shade-depth-active);
+}
+
+:is(button, a)[disabled] {
+    --_disabled-color: hsl(from var(--_color) h 0 50);
+    color: var(--_disabled-color);
+    border: 0.125rem solid var(--_disabled-color);
+    box-shadow: --box-shadow(var(--_shade-depth), var(--_disabled-color));
+    pointer-events: none;
+}

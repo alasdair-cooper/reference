@@ -1,0 +1,22 @@
+﻿@inherits DefaultComponentBase
+
+<div
+    class="@Class"
+    style="@Style"
+    @attributes="AdditionalAttributes">
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+
+    public string? Name { get => EnableMultipleOpen ? null : field; } = $"accordions-{Guid.NewGuid()}";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool EnableMultipleOpen { get; set; }
+
+}

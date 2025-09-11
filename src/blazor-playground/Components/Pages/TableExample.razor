@@ -1,0 +1,123 @@
+﻿@using System.Diagnostics
+@using AlasdairCooper.Reference.BlazorPlayground.Utilities
+@using AlasdairCooper.Reference.Components.Tables
+@using AlasdairCooper.Reference.Components.Inputs
+@using AlasdairCooper.Reference.Components.State
+@using AlasdairCooper.Reference.Shared.Common
+
+@page "/table"
+
+<Select
+    @bind-Value:get="(_sortDirection, _sortBy)"
+    @bind-Value:set="x => (_sortDirection, _sortBy) = x"
+    Label="Sort by">
+    @foreach (var value in Enum.GetValues<UserSortableField>().Select(IEnumerable<(SortDirection dir, UserSortableField field)> (x) => [(SortDirection.Ascending, x), (SortDirection.Descending, x)]).SelectMany(x => x))
+    {
+        <Option Value="@value">
+            <span>
+                @value.field
+            </span>
+            <div style="flex: 1 1"></div>
+            <span>
+                @ToDisplayString(ToSortType(value.field), value.dir)
+            </span>
+        </Option>
+    }
+</Select>
+
+<TableWithParameters
+    Store="_store"
+    Parameters="new TableParameters(_page, _pageSize, _sortDirection, _sortBy)"
+    T="User"
+    TParameters="TableParameters"
+    @bind-Page="_page"
+    @bind-PageSize="_pageSize">
+    <IndexColumn />
+    <Column
+        Title="First Name"
+        Property="x => x.FirstName" />
+    <Column
+        Title="Last Name"
+        Property="x => x.LastName" />
+    <Column
+        Title="Age"
+        Property="x => x.Age" />
+    <Column
+        Title="Gender"
+        Property="x => x.Gender" />
+    <Column
+        Title="Email"
+        Property="x => x.Email" />
+</TableWithParameters>
+
+@code {
+
+    private record TableParameters(int Page, int PageSize, SortDirection SortDirection, UserSortableField SortBy);
+
+    private int _page = 1;
+    private int _pageSize = 10;
+    private SortDirection _sortDirection = SortDirection.Ascending;
+    private UserSortableField _sortBy = UserSortableField.FirstName;
+    private readonly StateStore<TableParameters, TableData<User>> _store;
+
+    public TableExample(StateStoreFactory stateStoreFactory)
+    {
+        _store =
+            stateStoreFactory.Create(
+                (TableParameters @params) =>
+                {
+                    var users =
+                        UserGenerator.Users.Take(500)
+                            .OrderByDirection(
+                                @params.SortDirection,
+                                @params.SortBy switch
+                                {
+                                    UserSortableField.FirstName => x => x.FirstName,
+                                    UserSortableField.LastName => x => x.LastName,
+                                    UserSortableField.Age => x => x.Age,
+                                    UserSortableField.Email => x => x.Email,
+                                    _ => throw new ArgumentOutOfRangeException()
+                                })
+                            .ToList();
+
+                    return new TableData<User>(users.Skip((@params.Page - 1) * @params.PageSize).Take(@params.PageSize), users.Count);
+                });
+    }
+    
+    public enum UserSortableField
+    {
+        FirstName,
+        LastName,
+        Age,
+        Email,
+    }
+
+    private static SortType ToSortType(UserSortableField field) =>
+        field switch
+        {
+            UserSortableField.FirstName or UserSortableField.LastName => SortType.Alphabetical,
+            UserSortableField.Age => SortType.Numerical,
+            UserSortableField.Email => SortType.Other,
+            _ => throw new UnreachableException()
+        };
+
+    public enum SortType
+    {
+        Other,
+        Alphabetical,
+        Numerical,
+    }
+
+    private static string ToDisplayString(SortType sortType, SortDirection sortDirection) =>
+        (sortType, sortDirection) switch
+        {
+            (SortType.Alphabetical, SortDirection.Ascending) => "A-Z",
+            (SortType.Alphabetical, SortDirection.Descending) => "Z-A",
+            (SortType.Numerical, SortDirection.Ascending) => "Low to High",
+            (SortType.Numerical, SortDirection.Descending) => "High to Low",
+            (SortType.Other, SortDirection.Ascending) => "Ascending",
+            (SortType.Other, SortDirection.Descending) => "Descending",
+            _ => throw new UnreachableException()
+        };
+
+}

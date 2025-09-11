@@ -1,0 +1,79 @@
+﻿@using AlasdairCooper.Reference.Shared.Bcl
+
+@foreach (var dialog in _dialogs)
+{
+    <div id="@dialog.Id">
+        <DynamicComponent
+            Type="dialog.Type"
+            Parameters="dialog.Parameters" />
+    </div>
+}
+
+@code {
+
+    private readonly List<DialogInfo> _dialogs = [];
+    private AsyncLazy<IJSObjectReference> _module;
+
+    public DialogRenderer(DialogService dialogService, IJSRuntime jsRuntime)
+    {
+        dialogService.DialogRenderer = this;
+        _module = new AsyncLazy<IJSObjectReference>(async () => await jsRuntime.InvokeAsync<IJSObjectReference>("import", $"./_content/AlasdairCooper.Reference.Components/Dialog/{nameof(DialogRenderer)}.razor.js"));
+    }
+
+    public async Task<DialogResult<TResult?>> RenderDialogAsync<TDialog, TResult>(Action<TDialog> configureParams) where TDialog : DialogComponentBase<TResult>
+    {
+        var id = $"dialog-{Guid.NewGuid().ToString()}";
+
+        var result = new TaskCompletionSource<TResult?>();
+
+        var dialogInfo = new DialogInfo(typeof(TDialog), id, new Dictionary<string, object?> { [nameof(DialogComponentBase<>.ConfigureParams)] = (Action<object>)ConfigureParameters });
+
+        _dialogs.Add(dialogInfo);
+        StateHasChanged();
+
+        DialogResult<TResult?> res;
+
+        try
+        {
+            res = new SuccessDialogResult<TResult?>(await result.Task);
+        }
+        catch (TaskCanceledException)
+        {
+            res = new CancelledDialogResult<TResult?>();
+        }
+
+        await CancelDialogAsync(id);
+
+        _dialogs.Remove(dialogInfo);
+        StateHasChanged();
+
+        return res;
+
+        void ConfigureParameters(object x)
+        {
+            var dialog = x as TDialog ?? throw new InvalidOperationException();
+
+            configureParams.Invoke(dialog);
+
+#pragma warning disable BL0005
+            dialog.OnSubmit = result.SetResult;
+            dialog.OnCancel = result.SetCanceled;
+            dialog.OnLoad = async () => await ShowDialogAsync(id);
+#pragma warning restore BL0005
+        }
+    }
+
+    private async Task ShowDialogAsync(string id) => await (await _module).InvokeVoidAsync("openDialog", $"#{id} dialog");
+
+    private async Task CancelDialogAsync(string id) => await (await _module).InvokeVoidAsync("closeDialog", $"#{id} dialog");
+
+    private sealed class DialogInfo(Type type, string id, Dictionary<string, object?> parameters)
+    {
+        public string Id { get; set; } = id;
+
+        public Type Type { get; set; } = type;
+
+        public Dictionary<string, object?> Parameters { get; set; } = parameters;
+    }
+
+}

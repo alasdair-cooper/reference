@@ -1,0 +1,130 @@
+﻿@using Microsoft.Extensions.Options
+
+@typeparam TParameters
+@typeparam T
+
+<ErrorBoundary>
+    <ChildContent>
+        @if (Policy is not null || Roles is not null || Resource is not null)
+        {
+            <AuthorizeView
+                Policy="@Policy"
+                Roles="@Roles"
+                Resource="@Resource">
+                <Authorized>
+                    @RenderState(State)
+                </Authorized>
+                <Authorizing>
+                    @RenderLoading(new LoadingState())
+                </Authorizing>
+                <NotAuthorized>
+                    @RenderUnauthorized(context)
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+        else
+        {
+            @RenderState(State)
+        }
+    </ChildContent>
+    <ErrorContent>
+        @RenderError(new ErrorState(context))
+    </ErrorContent>
+</ErrorBoundary>
+
+@code {
+
+    private bool _hasLoadedAtLeastOnce;
+
+    protected State? State;
+
+    protected readonly RenderFragment<State?> RenderState;
+    protected readonly RenderFragment<ErrorState> RenderError;
+    protected readonly RenderFragment<AuthenticationState> RenderUnauthorized;
+    protected readonly RenderFragment<LoadingState> RenderLoading;
+
+    public StateViewWithParameters(IOptions<StateOptions> stateOptions)
+    {
+        RenderError = x => ErrorContent?.Invoke(x) ?? stateOptions.Value.DefaultErrorContent(x);
+        RenderUnauthorized = x => UnauthorizedContent?.Invoke(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles))) ?? stateOptions.Value.DefaultUnauthorizedContent(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles)));
+        RenderLoading = x => LoadingContent?.Invoke(x) ?? stateOptions.Value.DefaultLoadingContent(x);
+
+        RenderState =
+            x =>
+                x switch
+                {
+                    SuccessState<T> successState => SuccessContent?.Invoke(successState) ?? SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(successState.Value)) ?? ChildContent?.Invoke(successState) ?? throw new InvalidOperationException($"State view must have either {nameof(SuccessContent)}, {nameof(SuccessOrNotFoundContent)} or {nameof(ChildContent)} defined."),
+                    NotFoundState notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(default)) ?? NotFoundContent?.Invoke(notFound) ?? stateOptions.Value.DefaultNotFoundContent(notFound),
+                    ErrorState errorState => RenderError(errorState),
+                    TimedOutState timedOutState => TimedOutContent?.Invoke(timedOutState) ?? stateOptions.Value.DefaultTimedOutContent(timedOutState),
+                    LoadingState loadingState => RenderLoading(loadingState),
+                    _ => RenderLoading(new LoadingState())
+                };
+    }
+
+    [Parameter]
+    [EditorRequired]
+    public required StateStore<TParameters, T> Store { get; set; }
+
+    [Parameter]
+    public TParameters Parameters
+    {
+        get;
+        set
+        {
+            if (_hasLoadedAtLeastOnce && ((field is null && value is null) || (field is not null && field.Equals(value)))) return;
+            _hasLoadedAtLeastOnce = true;
+            field = value;
+            LoadStoreWithStateHandler(field);
+        }
+    } = default!;
+
+    [Parameter]
+    public RenderFragment<SuccessState<T>>? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<SuccessState<T>>? SuccessContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<SuccessOrNotFoundState<T>>? SuccessOrNotFoundContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<LoadingState>? LoadingContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<TimedOutState>? TimedOutContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<ErrorState>? ErrorContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<NotFoundState>? NotFoundContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<UnauthorizedState>? UnauthorizedContent { get; set; }
+
+    [Parameter]
+    public string? Policy { get; set; }
+
+    [Parameter]
+    public string? Roles { get; set; }
+
+    [Parameter]
+    public object? Resource { get; set; }
+
+    protected void LoadStoreWithStateHandler(TParameters parameters)
+    {
+        Store.StateChanged -= OnStateChanged;
+        Store.StateChanged += OnStateChanged;
+        _ = Store.LoadAsync(parameters);
+
+        return;
+
+        void OnStateChanged(object? _, State state)
+        {
+            State = state;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+}

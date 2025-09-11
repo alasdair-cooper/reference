@@ -1,0 +1,43 @@
+﻿@inherits DefaultComponentBase
+
+<details
+    name="@Accordions?.Name"
+    class="@Class"
+    style="@Style"
+    @attributes="AdditionalAttributes">
+    <summary
+        class="@HeaderClass"
+        style="@HeaderStyle"
+        @attributes="HeaderAdditionalAttributes">
+        @HeaderContent
+    </summary>
+    @ChildContent
+</details>
+
+@code {
+
+    private RenderFragment TitleFragment =>
+        @<span>@Title</span>;
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get => field ?? TitleFragment; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [CascadingParameter]
+    public Accordions? Accordions { get; set; }
+
+    [Parameter]
+    public string? HeaderClass { get; set; }
+
+    [Parameter]
+    public string? HeaderStyle { get; set; }
+
+    [Parameter]
+    public Dictionary<string, object?>? HeaderAdditionalAttributes { get; set; }
+
+}

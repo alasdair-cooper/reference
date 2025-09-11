@@ -1,0 +1,64 @@
+﻿@function --box-shadow(--depth: var(--shade-depth), --color: var(--key-default)) {
+    result: var(--depth) var(--depth) var(--color), calc(var(--depth) * 0.75) calc(var(--depth) * 0.75) var(--color), calc(var(--depth) * 0.5) calc(var(--depth) * 0.5) var(--color), calc(var(--depth) * 0.25) calc(var(--depth) * 0.25) var(--color);
+}
+
+:root {
+    interpolate-size: allow-keywords;
+    
+    --theme: light;
+    color-scheme: var(--theme);
+
+    --black: hsl(0 0 30);
+
+    --key-default: var(--black);
+    --key-info: hsl(200 100 20);
+    --key-success: hsl(120 100 20);
+    --key-warning: hsl(40 100 30);
+    --key-error: hsl(0 100 20);
+
+    --shade-depth: 0.25rem;
+    --shade-depth-hover: calc(var(--shade-depth) * 1.25);
+    --shade-depth-active: calc(var(--shade-depth) * 0.75);
+
+    @media (prefers-color-scheme: dark) {
+        --theme: dark;
+    }
+}
+
+:root:has(#theme [data-theme="light"]:checked) {
+    --theme: light;
+}
+
+:root:has(#theme [data-theme="dark"]:checked) {
+    --theme: dark;
+}
+
+* {
+    font-family: system-ui;
+}
+
+pre, code {
+    font-family: monospace;
+}
+
+dialog {
+    border: 0.125rem solid var(--key-default);
+    box-shadow: --box-shadow();
+    border-radius: 0.5rem;
+}
+
+details {
+    overflow: hidden;
+}
+
+details::details-content {
+    block-size: 0;
+    opacity: 0;
+    transition: block-size 200ms ease-in-out, content-visibility 200ms ease-in-out, opacity 200ms ease-in-out;
+    transition-behavior: allow-discrete;
+}
+
+details:open::details-content {
+    opacity: 1;
+    block-size: auto;
+}

@@ -1,0 +1,37 @@
+﻿@using System.Reflection
+@using Humanizer
+@using AlasdairCooper.Reference.Components.Inputs
+@using AlasdairCooper.Reference.Components.Dialog
+@using AlasdairCooper.Reference.Components.Utilities
+
+@inherits LayoutComponentBase
+
+<DialogRenderer />
+
+<nav style="display: flex; gap: 1rem; align-items: center;">
+    @foreach (var route in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.IsAssignableTo(typeof(IComponent))).SelectMany(x => x.GetCustomAttributes().OfType<RouteAttribute>().Select(routeAttribute => routeAttribute)).Select(x => x.Template).OrderBy(x => x.Length).Except(["/"]))
+    {
+        <NavLink
+            style="display: inline-block; text-box-edge: cap alphabetic; text-box-trim: trim-both;"
+            href="@route"
+            Match="NavLinkMatch.All">
+            @route.Titleize()
+        </NavLink>
+    }
+    <Spacer/>
+    <ThemeSelect />
+</nav>
+
+<hr />
+
+@Body
+
+<div
+    id="blazor-error-ui"
+    data-nosnippet>
+    An unhandled error has occurred.
+    <a
+        href="."
+        class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

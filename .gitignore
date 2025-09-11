@@ -1,0 +1,13 @@
+# .NET
+.dotnet
+artifacts
+bin
+obj
+
+# Rust
+target
+
+# IDEs
+.vs
+.idea
+*.DotSettings.user

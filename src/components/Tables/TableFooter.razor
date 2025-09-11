@@ -1,0 +1,93 @@
+﻿@using AlasdairCooper.Reference.Components.Inputs
+
+<div class="footer">
+    <span>@TotalCount items</span>
+    <button @onclick="GoToFirstPage" disabled="@IsFirstPage()">&lt;&lt;</button>
+    <button @onclick="GoToPreviousPage" disabled="@IsFirstPage()">&lt;</button>
+    <span>Page @Page of @GetTotalPages(PageSize)</span>
+    <button @onclick="GoToNextPage" disabled="@IsLastPage()">&gt;</button>
+    <button @onclick="GoToLastPage" disabled="@IsLastPage()">&gt;&gt;</button>
+</div>
+
+<Select
+    @bind-Value:get="PageSize"
+    @bind-Value:set="OnPageSizeChanged"
+    Label="Items per page">
+    @foreach(var size in PageSizes)
+    {
+        <Option Value="@size">@size</Option>
+    }
+</Select>
+
+@code {
+
+    [Parameter]
+    public int Page { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    [Parameter]
+    public int TotalCount { get; set; }
+    
+    [Parameter]
+    [EditorRequired]
+    public required IEnumerable<int> PageSizes { get; set; }
+
+    private async Task GoToPage(int page) => await PageChanged.InvokeAsync(page);
+
+    private int GetTotalPages(int pageSize) => TotalCount > 0 ? (int)Math.Ceiling((double)TotalCount / pageSize) : 0;
+
+    private bool IsFirstPage() => Page == 1;
+
+    private bool IsLastPage() => Page == GetTotalPages(PageSize);
+
+    private async Task GoToFirstPage()
+    {
+        if (!IsFirstPage())
+        {
+            await GoToPage(1);
+        }
+    }
+
+    private async Task GoToPreviousPage()
+    {
+        if (!IsFirstPage())
+        {
+            await GoToPage(Page - 1);
+        }
+    }
+
+    private async Task GoToNextPage()
+    {
+        if (!IsLastPage())
+        {
+            await GoToPage(Page + 1);
+        }
+    }
+
+    private async Task GoToLastPage()
+    {
+        if (!IsLastPage())
+        {
+            await GoToPage(GetTotalPages(PageSize));
+        }
+    }
+
+    private async Task OnPageSizeChanged(int pageSize)
+    {
+        await PageSizeChanged.InvokeAsync(pageSize);
+        
+        if (GetTotalPages(pageSize) < Page)
+        {
+            await PageChanged.InvokeAsync(GetTotalPages(pageSize));
+        }
+    }
+
+}

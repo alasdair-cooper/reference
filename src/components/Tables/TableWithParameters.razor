@@ -1,0 +1,115 @@
+﻿@using AlasdairCooper.Reference.Components.State
+
+@typeparam T
+@typeparam TParameters
+
+@inherits DefaultComponentBase
+@implements ITable<T>
+
+@attribute [CascadingTypeParameter(nameof(T))]
+
+<StateViewWithParameters Store="Store" Parameters="Parameters">
+    <table
+        id="@Id"
+        class="@Class"
+        style="@Style"
+        @attributes="AdditionalAttributes">
+        <thead>
+            <tr>
+                @foreach (var (_, column) in _columns.OrderBy(x => x.ordinal))
+                {
+                    <th>@column.Title</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var (index, item) in context.Value.Data.Index().Select(x => (x.Index + (Page - 1) * PageSize, x.Item)))
+            {
+                <tr>
+                    @foreach (var (_, column) in _columns.OrderBy(x => x.ordinal))
+                    {
+                        <td>
+                            @switch (column)
+                            {
+                                case { CellContent: { } cellContent }:
+                                    @cellContent(new CellContext<T>(item, index))
+                                    break;
+                                case { Property: { } property }:
+                                    @property(item)
+                                    break;
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!IsPagingDisabled)
+    {
+        <TableFooter
+            TotalCount="context.Value.TotalCount"
+            Page="Page"
+            PageChanged="OnPageChangedAsync"
+            PageSize="PageSize"
+            PageSizeChanged="OnPageSizeChangedAsync"
+            PageSizes="PageSizes" />
+    }
+</StateViewWithParameters>
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    private readonly HashSet<(int ordinal, Column<T> column)> _columns = [];
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public required StateStore<TParameters, TableData<T>> Store { get; set; }
+
+    [Parameter]
+    public int Page { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    [Parameter]
+    public IEnumerable<int> PageSizes { get; set; } = [10, 25, 50, 100];
+
+    [Parameter]
+    public bool IsPagingDisabled { get; set; }
+
+    [Parameter]
+    public TParameters Parameters { get; set; } = default!;
+
+    public async Task OnPageChangedAsync(int page)
+    {
+        await PageChanged.InvokeAsync(page);
+        await Store.LoadAsync(Parameters);
+    }
+
+    public async Task OnPageSizeChangedAsync(int pageSize)
+    {
+        await PageSizeChanged.InvokeAsync(pageSize);
+        await Store.LoadAsync(Parameters);
+    }
+
+    public void RegisterColumn(Column<T> column)
+    {
+        if (_columns.Add((column.Ordinal ?? 0, column)))
+        {
+            StateHasChanged();
+        }
+    }
+
+}

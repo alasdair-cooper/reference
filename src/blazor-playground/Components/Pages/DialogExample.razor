@@ -1,0 +1,22 @@
+﻿@using AlasdairCooper.Reference.Components.Dialog
+
+@page "/dialog"
+
+<button @onclick="ShowDialogAsync">Show Dialog</button>
+
+<span>@_result</span>
+
+<button @onclick="ShowEmptyDialogAsync">Show Empty Dialog</button>
+
+@code {
+
+    private object? _result;
+    private readonly DialogService _dialogService;
+
+    public DialogExample(DialogService dialogService) => _dialogService = dialogService;
+
+    private async Task ShowDialogAsync() => _result = await _dialogService.ShowDialogAsync<ConfirmationDialog, bool>();
+
+    private async Task ShowEmptyDialogAsync() => await _dialogService.ShowDialogAsync<EmptyDialog>();
+
+}

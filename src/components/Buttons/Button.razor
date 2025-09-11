@@ -1,0 +1,37 @@
+﻿@using AlasdairCooper.Reference.Components.Utilities
+@if (Href is not null)
+{
+    <a href="@Href" disabled="@IsDisabled" style="--_color: @(Color.ToValidCssColor())">
+        @ChildContent       
+    </a>
+}
+else
+{
+    <button @onclick="OnClick" disabled="@IsDisabled" style="--_color: @(Color.ToValidCssColor())">
+        @ChildContent
+    </button>
+}
+
+@code {
+    
+    private RenderFragment TextContent => @<span>@Text</span>;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+    
+    [Parameter]
+    public string? Href { get; set; } 
+
+    [Parameter]
+    public string? Text { get; set; }
+    
+    [Parameter]
+    public RenderFragment? ChildContent { get => field ?? TextContent; set; }
+    
+    [Parameter]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
+
+}

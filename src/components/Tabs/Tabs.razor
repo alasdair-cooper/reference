@@ -1,0 +1,68 @@
+﻿@inherits DefaultComponentBase
+
+<nav
+    id="@Id"
+    style="@Style"
+    class="@Class"
+    @attributes="AdditionalAttributes">
+    @foreach (var (index, tab) in _tabs.Index())
+    {
+        var id = $"tab-header-{Guid.NewGuid()}";
+        <input
+            type="radio"
+            id="@id"
+            name="@_name"
+            value="@index"
+            checked="@(_selectedTabIndex == index)"
+            @onchange="@(() => ChangeTab(index))"
+            hidden>
+        <label
+            for="@id"
+            id="@tab.HeaderId"
+            class="@tab.HeaderClass"
+            style="@tab.HeaderStyle"
+            @attributes="tab.HeaderAdditionalAttributes">
+            @tab.HeaderContent
+        </label>
+    }
+</nav>
+
+@if (_tabs.ElementAtOrDefault(_selectedTabIndex) is { } currentTab)
+{
+    <div
+        id="@currentTab.Id"
+        style="@currentTab.Style"
+        class="@currentTab.Class"
+        @attributes="@currentTab.AdditionalAttributes">
+        @currentTab.ChildContent
+    </div>
+}
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    private int _selectedTabIndex;
+    private readonly string _name = $"tabs-{Guid.NewGuid()}";
+    private readonly HashSet<Tab> _tabs = [];
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    public void RegisterTab(Tab tab)
+    {
+        if (_tabs.Add(tab))
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void ChangeTab(int index)
+    {
+        _selectedTabIndex = index;
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,38 @@
+﻿@using AlasdairCooper.Reference.Components.State
+@using AlasdairCooper.Reference.Shared.Api
+
+@page "/promotions"
+
+@code { public static string Url() => "/promotions"; }
+
+<PageTitle>Promotions</PageTitle>
+
+<h1>Promotions</h1>
+
+<Table Store="_state">
+    <Column
+        Title="Name"
+        Property="x => x.DisplayName" />
+    <Column Title="Period">
+        <CellContent>
+            @context.Item.StartDate - @context.Item.EndDate
+        </CellContent>
+    </Column>
+    <Column Title="Media">
+        <CellContent>
+            @context.Item.MediaUrls.Length
+        </CellContent>
+    </Column>
+</Table>
+
+@code {
+
+    private readonly StateStore<TableData<PromotionDto>> _state;
+
+    public Promotions(ApiClient client, StateStoreFactory stateStoreFactory) => _state = stateStoreFactory.Create(async x =>
+    {
+        var promotions = await client.ListPromotionsAsync(x);
+        return new TableData<PromotionDto>(promotions, promotions.Count);
+    });
+
+}

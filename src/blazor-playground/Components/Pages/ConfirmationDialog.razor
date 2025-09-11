@@ -1,0 +1,8 @@
+﻿@inherits AlasdairCooper.Reference.Components.Dialog.DialogComponentBase<bool>
+
+<dialog>
+    <button @onclick="Cancel">X</button>
+    Are you sure?
+    <button @onclick="() => Submit(false)">No</button>
+    <button @onclick="() => Submit(true)">Yes</button>
+</dialog>

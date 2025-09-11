@@ -1,0 +1,123 @@
+﻿@using AlasdairCooper.Reference.BlazorPlayground.Utilities
+@using AlasdairCooper.Reference.Components.State
+
+@page "/state"
+
+<h1>States</h1>
+
+<h2>From Value</h2>
+
+<StateView Store="_fromValueStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory</h2>
+
+<StateView Store="_fromFactoryStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (with param)</h2>
+
+<button @onclick="() => _currentIndex = _currentIndex > 0 ? _currentIndex - 1 : _currentIndex">Prev</button>
+
+<StateViewWithParameters
+    Store="_fromFactoryWithParamStateStore"
+    Parameters="_currentIndex">
+    @context.Value.ToDisplayString()
+</StateViewWithParameters>
+
+<button @onclick="() => _currentIndex++">Next</button>
+
+<h2>From Factory (with delay)</h2>
+
+<StateView Store="_fromFactoryWithDelayStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<button @onclick="() => _fromFactoryWithDelayStateStore.LoadAsync()">Reload</button>
+
+<h2>From Factory (with delay & timeout)</h2>
+
+<StateView Store="_fromFactoryWithDelayAndTimeoutStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<button @onclick="() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync()">Reload</button>
+
+<h2>From Factory (with error in factory)</h2>
+
+<StateView Store="_fromFactoryWithErrorStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (with error in component)</h2>
+
+<StateView Store="_fromFactoryStateStore">
+    @_throwingFragment
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (missing role)</h2>
+
+<StateView
+    Store="_fromFactoryStateStore"
+    Roles="test">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (policy fails)</h2>
+
+<StateView
+    Store="_fromFactoryStateStore"
+    Policy="test">
+    @context.Value.ToDisplayString()
+</StateView>
+
+@code {
+
+    int _currentIndex;
+
+    private readonly RenderFragment _throwingFragment =
+        @<span>
+            @{ throw new InvalidOperationException("Something went wrong in this component."); }
+        </span>;
+
+    private readonly StateStore<User> _fromValueStateStore;
+    private readonly StateStore<User> _fromFactoryStateStore;
+    private readonly StateStore<int, User> _fromFactoryWithParamStateStore;
+    private readonly StateStore<User> _fromFactoryWithDelayStateStore;
+    private readonly StateStore<User> _fromFactoryWithDelayAndTimeoutStateStore;
+    private readonly StateStore<User> _fromFactoryWithErrorStateStore;
+
+    public StateExample(StateStoreFactory stateStoreFactory)
+    {
+        _fromValueStateStore = stateStoreFactory.Create(GetUser());
+
+        _fromFactoryStateStore = stateStoreFactory.Create(() => GetUser());
+
+        _fromFactoryWithParamStateStore = stateStoreFactory.Create<int, User>(GetUser);
+
+        _fromFactoryWithDelayStateStore =
+            stateStoreFactory.Create(
+                async () =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(3));
+                    return GetUser();
+                });
+
+        _fromFactoryWithDelayAndTimeoutStateStore =
+            stateStoreFactory.Create(
+                async ct =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(3), ct);
+                    return GetUser();
+                },
+                x => x.Timeout = TimeSpan.FromSeconds(1));
+
+        _fromFactoryWithErrorStateStore = stateStoreFactory.Create(User () => throw new InvalidOperationException("Something went wrong in this factory.", new AggregateException("This is an inner exception.")));
+    }
+
+    private static User GetUser(int index = 0) => UserGenerator.Users.Skip(index).First();
+
+}

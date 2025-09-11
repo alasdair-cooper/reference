@@ -1,0 +1,22 @@
+﻿@using AlasdairCooper.Reference.Components.Utilities
+
+@inherits DefaultComponentBase
+
+<Alert
+    Level="AlertLevel.Error"
+    Class="@Class"
+    Style="@Style"
+    AdditionalAttributes="AdditionalAttributes">
+    <p>
+        <strong>@Exception.GetType().Name</strong> @Exception.Message
+    </p>
+    <pre>@Exception.StackTrace</pre>
+</Alert>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required Exception Exception { get; set; }
+
+}

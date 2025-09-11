@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.0" />
+    
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsAspireHost>true</IsAspireHost>
+        <UserSecretsId>af280bb1-ffcf-4454-87b8-0ed440955fec</UserSecretsId>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.4.0" />
+        <PackageReference Include="Aspire.Hosting.Garnet" Version="9.4.1" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.4.0" />
+        <PackageReference Include="Aspire.Hosting.Redis" Version="9.4.1" />
+        <PackageReference Include="Aspire4Wasm.AppHost" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\api\api\AlasdairCooper.Reference.Api.csproj" />
+        <ProjectReference Include="..\..\api\generator\AlasdairCooper.Reference.Api.Generator.csproj" />
+        <ProjectReference Include="..\..\api\migrator\AlasdairCooper.Reference.Api.Migrator.csproj" />
+        <ProjectReference Include="..\..\internal-frontend\AlasdairCooper.Reference.InternalFrontend.csproj" />
+        <ProjectReference Include="..\..\shared\AlasdairCooper.Reference.Shared.csproj" IsAspireProjectResource="false" />
+    </ItemGroup>
+
+</Project>

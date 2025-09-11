@@ -1,0 +1,53 @@
+﻿@using AlasdairCooper.Reference.Components.State
+@using AlasdairCooper.Reference.Shared.Api
+
+@page "/users"
+
+@code { public static string Url() => "/users"; }
+
+<PageTitle>Users</PageTitle>
+
+<h1>Users</h1>
+
+<TableWithParameters
+    @bind-Page="_query.Page"
+    @bind-PageSize="_query.PageSize"
+    Parameters="_query"
+    Store="_userStore"
+    T="UserDto"
+    TParameters="UserQuery">
+    <Column
+        Title="First Name"
+        Property="x => x.FirstName" />
+    <Column Title="Middle Names">
+        <CellContent>
+            @string.Join(' ', context.Item.MiddleNames)
+        </CellContent>
+    </Column>
+    <Column
+        Title="Last Name"
+        Property="x => x.LastName" />
+</TableWithParameters>
+
+@code {
+
+    private class UserQuery
+    {
+        public int Page { get; set; } = 1;
+
+        public int PageSize { get; set; } = 10;
+    }
+
+    private readonly UserQuery _query = new();
+    private readonly StateStore<UserQuery, TableData<UserDto>> _userStore;
+
+    public Users(StateStoreFactory stateStoreFactory, ApiClient client) =>
+        _userStore =
+            stateStoreFactory.Create(
+                async (UserQuery query, CancellationToken ct) =>
+                {
+                    var (users, count) = await client.ListUsersAsync(query.Page, query.PageSize, cancellationToken: ct);
+                    return new TableData<UserDto>(users, count);
+                });
+
+}

@@ -1,0 +1,89 @@
+﻿@inherits DefaultComponentBase
+
+@using AlasdairCooper.Reference.Components.Utilities
+@typeparam T
+
+@attribute [CascadingTypeParameter(nameof(T))]
+
+@if (Label is not null)
+{
+    <label for="@Id">
+        @Label
+    </label>
+}
+
+<select
+    id="@Id"
+    style="@Style"
+    class="@Class"
+    @attributes="AdditionalAttributes"
+    @bind="_selectedIndex"
+    @bind:after="OnSelectedIndexChanged">
+    <button>
+        <selectedcontent></selectedcontent>
+    </button>
+    @foreach (var (index, option) in _options.Index())
+    {
+        <option
+            id="@option.Id"
+            style="@option.Style"
+            class="@option.Class"
+            @attributes="AdditionalAttributes"
+            value="@index">
+            @option.ChildContent
+        </option>
+    }
+</select>
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    private int _selectedIndex;
+    private readonly HashSet<Option<T>> _options = [];
+
+    private new string Id { get => base.Id ?? field; } = $"select-{Guid.NewGuid()}";
+
+    [Parameter]
+    public T Value { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+    
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
+
+    protected override void OnParametersSet() => SetSelectedIndexForValue();
+
+    public void RegisterOption(Option<T> option)
+    {
+        if (!_options.Add(option)) return;
+
+        SetSelectedIndexForValue();
+
+        StateHasChanged();
+    }
+
+    private void SetSelectedIndexForValue()
+    {
+        if (_options.Select(x => x.Value).ToList().IndexOf(Value) is var index and >= 0)
+        {
+            _selectedIndex = index;
+        }
+    }
+
+    private async Task OnSelectedIndexChanged()
+    {
+        var option = _options.ElementAtOrDefault(_selectedIndex);
+        await ValueChanged.InvokeAsync(option is not null ? option.Value : default);
+    }
+
+}

@@ -1,0 +1,53 @@
+﻿select, ::picker(select) {
+    appearance: base-select;
+}
+
+option::checkmark {
+    display: none;
+}
+
+option, selectedcontent {
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+}
+
+select, select:open::picker(select) {
+    min-width: 6rem;
+    padding: 0.5rem 1rem;
+    color: var(--_color);
+    border: 0.125rem solid var(--_color);
+    box-shadow: --box-shadow(var(--_shade-depth), var(--_color));
+    translate: calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth))) calc(var(--shade-depth) - var(--_shade-depth, var(--shade-depth)));
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+select {
+    --_color: currentColor;
+    display: inline-block;
+    text-box-edge: cap alphabetic;
+    text-box-trim: trim-both;
+    text-align: center;
+    border-radius: 0.5rem;
+    transition: box-shadow 200ms ease-in-out, translate 200ms ease-in-out;
+}
+
+select:open::picker(select) {
+    display: grid;
+    gap: 0.5rem;
+}
+
+select:hover, select:open {
+    --_shade-depth: var(--shade-depth-hover);
+}
+
+select[disabled] {
+    --_disabled-color: hsl(from var(--_color) h 0 50);
+    color: var(--_disabled-color);
+    border: 0.125rem solid var(--_disabled-color);
+    box-shadow: --box-shadow(var(--_shade-depth), var(--_disabled-color));
+    pointer-events: none;
+}

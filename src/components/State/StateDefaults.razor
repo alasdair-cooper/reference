@@ -1,0 +1,34 @@
+﻿@using Humanizer
+@using AlasdairCooper.Reference.Components.Utilities
+
+@code {
+
+    public static class DefaultContent
+    {
+        public static readonly RenderFragment<LoadingState> Loading = _ => @<span>Loading...</span>;
+
+        public static readonly RenderFragment<TimedOutState> TimedOut =
+            x =>
+                @<Alert Level="AlertLevel.Error">
+                    Timed out after @x.Timeout.Humanize()
+                </Alert>;
+
+        public static readonly RenderFragment<ErrorState> Error =
+            x =>
+                @<ErrorSummary Exception="x.Exception" />;
+
+        public static readonly RenderFragment<NotFoundState> NotFound =
+            _ =>
+                @<Alert Level="AlertLevel.Warning">
+                    Item not found.
+                </Alert>;
+
+        public static readonly RenderFragment<UnauthorizedState> Unauthorized =
+            x =>
+                @<AuthorizationSummary
+                    User="x.User"
+                    Resource="x.Resource"
+                    AuthorizeData="x.AuthorizeData" />;
+    }
+
+}

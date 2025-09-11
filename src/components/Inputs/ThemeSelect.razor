@@ -1,0 +1,31 @@
+﻿@using Blazored.LocalStorage
+
+<Select
+    @bind-Value="_theme"
+    @bind-Value:after="PersistThemeAsync"
+    Id="theme"
+    data-theme="@_theme">
+    <Option Value="@("auto")">System</Option>
+    <Option Value="@("light")">Light</Option>
+    <Option Value="@("dark")">Dark</Option>
+</Select>
+
+@code {
+    private readonly ILocalStorageService _localStorageService;
+
+    private string _theme = "auto";
+
+    public ThemeSelect(ILocalStorageService localStorageService) => _localStorageService = localStorageService;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _theme = await _localStorageService.GetItemAsStringAsync("theme") ?? "auto";
+            StateHasChanged();
+        }
+    }
+
+    private async Task PersistThemeAsync() => await _localStorageService.SetItemAsStringAsync("theme", _theme);
+
+}

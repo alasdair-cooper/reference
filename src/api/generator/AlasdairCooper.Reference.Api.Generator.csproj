@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>
+            dotnet-AlasdairCooper.Reference.Api.Migrator-48f096be-a07a-42e6-a7cb-3eb9b483a219</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.4.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="WaffleGenerator.Bogus" Version="4.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference
+            Include="..\..\orchestration\service-defaults\AlasdairCooper.Reference.Orchestration.ServiceDefaults.csproj" />
+        <ProjectReference Include="..\..\shared\AlasdairCooper.Reference.Shared.csproj" />
+        <ProjectReference Include="..\data\AlasdairCooper.Reference.Api.Data.csproj" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,20 @@
+﻿@using AlasdairCooper.Reference.Components.Inputs
+
+@page "/select"
+
+<Select @bind-Value="_value" Label="Example">
+    <Option Value="(TestItem?)null">Select an item</Option>    
+    <Option Value="new TestItem(1)">Item <strong>1</strong></Option>    
+    <Option Value="new TestItem(2)">Item <i>2</i></Option>    
+    <Option Value="new TestItem(3)">Item <span style="color: red">3</span></Option>    
+</Select>
+
+<span>Selected: @_value</span>
+
+@code {
+
+    private TestItem? _value;
+
+    public record TestItem(int Value);
+
+}

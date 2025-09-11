@@ -1,0 +1,51 @@
+﻿@using AlasdairCooper.Reference.Components.State
+@using AlasdairCooper.Reference.Shared.Api
+
+@page "/items"
+
+@code { public static string Url() => "/items"; }
+
+<PageTitle>Items</PageTitle>
+
+<h1>Items</h1>
+
+<TableWithParameters
+    @bind-Page="_query.Page"
+    @bind-PageSize="_query.PageSize"
+    Parameters="_query"
+    Store="_store"
+    T="ItemDto"
+    TParameters="ItemQuery">
+    <Column
+        Title="Name"
+        Property="x => x.DisplayName" />
+    <Column
+        Title="MSRP"
+        Property="x => x.PricePreDiscount" />
+    <Column
+        Title="Current Price"
+        Property="x => x.ActualPrice" />
+</TableWithParameters>
+
+@code {
+
+    private class ItemQuery
+    {
+        public int Page { get; set; } = 1;
+
+        public int PageSize { get; set; } = 10;
+    }
+
+    private readonly ItemQuery _query = new();
+    private readonly StateStore<ItemQuery, TableData<ItemDto>> _store;
+
+    public Items(StateStoreFactory stateStoreFactory, ApiClient client) =>
+        _store =
+            stateStoreFactory.Create(
+                async (ItemQuery query, CancellationToken ct) =>
+                {
+                    var (users, count) = await client.ListItemsAsync(query.Page, query.PageSize, cancellationToken: ct);
+                    return new TableData<ItemDto>(users, count);
+                });
+
+}

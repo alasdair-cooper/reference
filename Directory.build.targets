@@ -1,0 +1,6 @@
+<Project>
+    <!-- See https://github.com/dotnet/efcore/issues/23853#issuecomment-2491134216 -->
+    <Import
+        Condition="Exists('$(MSBuildProjectDirectory)\obj\$(MSBuildProjectFile).EntityFrameworkCore.targets')"
+        Project="$(MSBuildProjectDirectory)\obj\$(MSBuildProjectFile).EntityFrameworkCore.targets" />
+</Project>

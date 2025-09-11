@@ -1,0 +1,66 @@
+﻿@using AlasdairCooper.Reference.Components.Buttons
+@using AlasdairCooper.Reference.Components.Utilities
+
+@page "/buttons"
+
+<div style="display: flex; flex-wrap: wrap; gap: 1rem">
+    <Button Href="/buttons">Link</Button>
+    <Button OnClick="_onClick">
+        Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        IsDisabled="true">
+        Disabled Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        Color="AlertLevel.Info">
+        Info Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        IsDisabled="true"
+        Color="AlertLevel.Info">
+        Disabled Info Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        Color="AlertLevel.Error">
+        Error Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        IsDisabled="true"
+        Color="AlertLevel.Error">
+        Disabled Error Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        Color="AlertLevel.Success">
+        Success Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        IsDisabled="true"
+        Color="AlertLevel.Success">
+        Disabled Success Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        Color="AlertLevel.Warning">
+        Warning Button
+    </Button>
+    <Button
+        OnClick="_onClick"
+        IsDisabled="true"
+        Color="AlertLevel.Warning">
+        Disabled Warning Button
+    </Button>
+</div>
+
+
+@code {
+
+    private readonly Action _onClick = () => { };
+}

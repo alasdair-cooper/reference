@@ -1,0 +1,12 @@
+﻿details {
+    padding: 1rem;
+    border: 0.125rem solid var(--key-default);
+    border-radius: 0.5rem;
+    transition: box-shadow 200ms ease-in-out, translate 200ms ease-in-out;
+    box-shadow: --box-shadow();
+}
+
+summary {
+    cursor: pointer;
+    user-select: none;
+}
