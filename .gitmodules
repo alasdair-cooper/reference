@@ -1,0 +1,3 @@
+[submodule "lib/efcore"]
+	path = lib/efcore
+	url = https://github.com/alasdair-cooper/efcore
