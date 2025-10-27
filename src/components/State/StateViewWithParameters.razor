@@ -1,4 +1,6 @@
-﻿@using Microsoft.Extensions.Options
+﻿@using System.ComponentModel
+@using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.Options
 
 @typeparam TParameters
 @typeparam T
@@ -33,6 +35,7 @@
 </ErrorBoundary>
 
 @code {
+    private readonly ILogger<StateViewWithParameters<TParameters, T>> _logger;
 
     private bool _hasLoadedAtLeastOnce;
 
@@ -43,8 +46,10 @@
     protected readonly RenderFragment<AuthenticationState> RenderUnauthorized;
     protected readonly RenderFragment<LoadingState> RenderLoading;
 
-    public StateViewWithParameters(IOptions<StateOptions> stateOptions)
+    public StateViewWithParameters(IOptions<StateOptions> stateOptions, ILogger<StateViewWithParameters<TParameters, T>> logger)
     {
+        _logger = logger;
+
         RenderError = x => ErrorContent?.Invoke(x) ?? stateOptions.Value.DefaultErrorContent(x);
         RenderUnauthorized = x => UnauthorizedContent?.Invoke(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles))) ?? stateOptions.Value.DefaultUnauthorizedContent(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles)));
         RenderLoading = x => LoadingContent?.Invoke(x) ?? stateOptions.Value.DefaultLoadingContent(x);
@@ -72,10 +77,50 @@
         get;
         set
         {
-            if (_hasLoadedAtLeastOnce && ((field is null && value is null) || (field is not null && field.Equals(value)))) return;
+            if (!ShouldRun()) return;
+
+            // If the parameter type implements `INotifyPropertyChanged`, only run the setter once
+            if (_hasLoadedAtLeastOnce && field is INotifyPropertyChanged) return;
+
             _hasLoadedAtLeastOnce = true;
             field = value;
             LoadStoreWithStateHandler(field);
+
+            // Parameters implementing `INotifyPropertyChanged` trigger state reloading themselves 
+            if (field is INotifyPropertyChanged notifyPropertyChanged)
+            {
+                notifyPropertyChanged.PropertyChanged +=
+                    (@object, _) =>
+                    {
+                        field = (TParameters)@object!;
+                        LoadStoreWithStateHandler(field);
+                    };
+            }
+
+            return;
+
+            bool ShouldRun()
+            {
+                // Always set the parameter value the first time the setter is called
+                if (!_hasLoadedAtLeastOnce)
+                {
+                    return true;
+                }
+
+                switch (value, field)
+                {
+                    case (null, null):
+                        return false;
+                    case (null, not null) or (not null, null):
+                        return true;
+                    case (IEquatable<TParameters> a, IEquatable<TParameters> b):
+                        return !a.Equals(b);
+                    default:
+                        _logger.LogWarning($"State views with reference type parameters reload more frequently than necessary. Consider implementing {nameof(IEquatable<>)} or {nameof(INotifyPropertyChanged)} for {nameof(TParameters)}.");
+                        // Reference types always trigger the value to be updated as there is no way to tell if there's been a change or not
+                        return true;
+                }
+            }
         }
     } = default!;
 
