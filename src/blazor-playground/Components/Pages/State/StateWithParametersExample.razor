@@ -12,7 +12,7 @@
 <StateViewWithParameters
     Store="_fromFactoryWithIntParamStateStore"
     Parameters="_count">
-    @context.Value.ToDisplayString() (Loaded at @context.Context.LastLoadedAt.ToString("T")
+    @context.Value.ToDisplayString() (Loaded at @context.LoadedAt.ToString("T")
 </StateViewWithParameters>
 
 <button @onclick="@(() => _count++)">Next</button>
@@ -24,7 +24,7 @@
 <StateViewWithParameters
     Store="_fromFactoryWithTupleParamStateStore"
     Parameters="_countTuple">
-    @context.Value.ToDisplayString() (Loaded at @context.Context.LastLoadedAt.ToString("T")
+    @context.Value.ToDisplayString() (Loaded at @context.LoadedAt.ToString("T")
 </StateViewWithParameters>
 
 <button @onclick="@(() => _countTuple = (_countTuple.Item1 + 1, ""))">Next</button>
@@ -36,7 +36,7 @@
 <StateViewWithParameters
     Store="_fromFactoryWithRecordParamStateStore"
     Parameters="_countRecord">
-    @context.Value.ToDisplayString() (Loaded at @context.Context.LastLoadedAt.ToString("T")
+    @context.Value.ToDisplayString() (Loaded at @context.LoadedAt.ToString("T")
 </StateViewWithParameters>
 
 <button @onclick="@(() => _countRecord = new CountRecord(_countRecord.Count + 1))">Next</button>
@@ -48,7 +48,7 @@
 <StateViewWithParameters
     Store="_fromFactoryWithClassParamStateStore"
     Parameters="_countClass">
-    @context.Value.ToDisplayString() (Loaded at @context.Context.LastLoadedAt.ToString("T")
+    @context.Value.ToDisplayString() (Loaded at @context.LoadedAt.ToString("T")
 </StateViewWithParameters>
 
 <button @onclick="@(() => _countClass.Count += 1)">Next</button>

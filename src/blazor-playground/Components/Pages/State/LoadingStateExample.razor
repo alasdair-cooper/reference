@@ -5,13 +5,26 @@
 
 <h1>Loading State</h1>
 
+<h2>From Factory (with progress)</h2>
+
+<StateView Store="_fromFactoryWithProgress">
+    <SuccessContent>
+        @context.Value.ToDisplayString()
+        <button @onclick="@context.Reload">Reload</button>
+    </SuccessContent>
+    <LoadingContent>
+        <progress value="@context.Progress"></progress>
+    </LoadingContent>
+</StateView>
+
+<button @onclick="@(() => _fromFactoryWithProgress.LoadAsync())">Reload (External)</button>
+
 <h2>From Factory (with delay)</h2>
 
 <StateView Store="_fromFactoryWithDelayStateStore">
     @context.Value.ToDisplayString()
+    <button @onclick="@context.Reload">Reload</button>
 </StateView>
-
-<button @onclick="() => _fromFactoryWithDelayStateStore.LoadAsync()">Reload</button>
 
 <h2>From Factory (with delay & timeout)</h2>
 
@@ -19,15 +32,32 @@
     @context.Value.ToDisplayString()
 </StateView>
 
-<button @onclick="() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync()">Reload</button>
+<button @onclick="@(() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync())">Reload (External)</button>
 
 @code {
 
+    private readonly StateStore<User> _fromFactoryWithProgress;
     private readonly StateStore<User> _fromFactoryWithDelayStateStore;
     private readonly StateStore<User> _fromFactoryWithDelayAndTimeoutStateStore;
 
     public LoadingStateExample(StateStoreFactory stateStoreFactory)
     {
+        _fromFactoryWithProgress = stateStoreFactory.Create(
+            async (state, ct) =>
+            {
+                const int step = 5;
+                var timeToLoad = TimeSpan.FromSeconds(3);
+                var delayPerStep = timeToLoad / 100 * step;
+
+                foreach (var progress in Enumerable.Range(0, 100 / step).Select(x => (double)x * step / 100))
+                {
+                    state.Report(progress);
+                    await Task.Delay(delayPerStep, ct);
+                }
+                
+                return GetUser();
+            });
+        
         _fromFactoryWithDelayStateStore =
             stateStoreFactory.Create(
                 async () =>

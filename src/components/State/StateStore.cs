@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,7 +25,6 @@ public class StateStore<TParameters, T>
     private readonly ILogger _logger;
     private readonly TimeProvider _timeProvider;
     private readonly StateLoader<TParameters, T> _factory;
-    private readonly bool _supportsProgress;
     private readonly SemaphoreSlim _lock = new(1, 1);
     private CancellationTokenSource? _cts;
 
@@ -39,16 +39,13 @@ public class StateStore<TParameters, T>
         _logger = logger;
         _timeProvider = timeProvider;
 
-        State = LoadingState.Indeterminate(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()), NewContext());
-        // State = LoadingState.Zero(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()), NewContext());
         _buildOptions = buildOptions;
         _options = _buildOptions();
         _factory = factory;
-        _supportsProgress = true;
+
+        State = NewLoadingState();
     }
-
-    private StateContext NewContext() => new(_timeProvider.GetUtcNow());
-
+    
     private State State
     {
         get;
@@ -58,6 +55,9 @@ public class StateStore<TParameters, T>
             StateChanged?.Invoke(this, value);
         }
     }
+    
+    internal LoadingState NewLoadingState() =>
+        _options.IsProgressSupported ? new LoadingState(_timeProvider.GetUtcNow(), x => State = x, 0) : new LoadingState(_timeProvider.GetUtcNow());
 
     public async Task LoadAsync(TParameters parameters)
     {
@@ -77,29 +77,40 @@ public class StateStore<TParameters, T>
 
             await _lock.WaitAsync();
 
-            var loadingState =
-                State as LoadingState ?? new LoadingState(NewContext(), () => StateChanged?.Invoke(this, State), _supportsProgress ? 0 : null);
+            var loadingState = State as LoadingState ?? NewLoadingState();
 
             State = loadingState;
 
             _cts = new CancellationTokenSource(_options.Timeout);
 
-            var res = await Task.Run(async () => await _factory(parameters, loadingState, _cts.Token));
+            var stopwatch = new Stopwatch();
+
+            var res =
+                await Task.Run(
+                    async () =>
+                    {
+                        stopwatch.Start();
+                        var res = await _factory(parameters, loadingState, _cts.Token);
+                        stopwatch.Stop();
+                        return res;
+                    });
+            
+            _logger.LogTrace("State loaded in {Elapsed}", stopwatch.Elapsed);
 
             State =
                 res switch
                 {
-                    not null => new SuccessState<T>(res, NewContext()),
-                    null => new NotFoundState(NewContext())
+                    not null => new SuccessState<T>(res, _timeProvider.GetUtcNow(), stopwatch.Elapsed),
+                    null => new NotFoundState(_timeProvider.GetUtcNow(), stopwatch.Elapsed)
                 };
         }
         catch (OperationCanceledException ex)
         {
-            State = new TimedOutState(ex, _options.Timeout, NewContext());
+            State = new TimedOutState(ex, _options.Timeout);
         }
         catch (Exception ex)
         {
-            State = new ErrorState(ex, NewContext());
+            State = new ErrorState(ex);
             _logger.LogError(ex, "An error occurred while loading state.");
         }
         finally

@@ -8,13 +8,14 @@
 <h2>From Value</h2>
 
 <StateView Store="_fromValueStateStore">
-    @context.Value.ToDisplayString()
+    @context.Value.ToDisplayString() 
 </StateView>
 
 <h2>From Factory</h2>
 
 <StateView Store="_fromFactoryStateStore">
-    @context.Value.ToDisplayString()
+    @context.Value.ToDisplayString() Loaded at @context.LoadedAt.ToString("HH:mm:ss.ffffff") in @context.LoadedIn.TotalMilliseconds ms, rendered at @context.RenderedAt.ToString("HH:mm:ss.ffffff")
+    <button @onclick="@context.Reload">Reload</button>
 </StateView>
 
 <h2>From Factory (missing role)</h2>

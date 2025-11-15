@@ -11,7 +11,7 @@ public class StateStoreFactory(IOptions<StateOptions> options, IServiceProvider 
     public StateStore<TParameters, T> Create<TParameters, T>(
         Func<TParameters, LoadingState, T> factory,
         Action<StateOptions>? configureOptions = null) =>
-        CreateCore<TParameters, T>((@params, state, _) => ValueTask.FromResult(factory(@params, state)), configureOptions);
+        CreateCore<TParameters, T>((@params, state, _) => ValueTask.FromResult(factory(@params, state)), EnableProgress(configureOptions));
 
     public StateStore<TParameters, T>
         Create<TParameters, T>(Func<TParameters, ValueTask<T>> factory, Action<StateOptions>? configureOptions = null) =>
@@ -25,13 +25,13 @@ public class StateStoreFactory(IOptions<StateOptions> options, IServiceProvider 
     public StateStore<TParameters, T> Create<TParameters, T>(
         Func<TParameters, LoadingState, CancellationToken, ValueTask<T>> factory,
         Action<StateOptions>? configureOptions = null) =>
-        CreateCore<TParameters, T>((@params, state, ct) => factory(@params, state, ct), configureOptions);
+        CreateCore<TParameters, T>((@params, state, ct) => factory(@params, state, ct), EnableProgress(configureOptions));
 
     public StateStore<T> Create<T>(Func<T> factory, Action<StateOptions>? configureOptions = null) =>
         CreateCore<T>((_, _, _) => ValueTask.FromResult(factory()), configureOptions);
 
     public StateStore<T> Create<T>(Func<LoadingState, T> factory, Action<StateOptions>? configureOptions = null) =>
-        CreateCore<T>((_, state, _) => ValueTask.FromResult(factory(state)), configureOptions);
+        CreateCore<T>((_, state, _) => ValueTask.FromResult(factory(state)), EnableProgress(configureOptions));
 
     public StateStore<T> Create<T>(Func<ValueTask<T>> factory, Action<StateOptions>? configureOptions = null) =>
         CreateCore<T>((_, _, _) => factory(), configureOptions);
@@ -40,7 +40,7 @@ public class StateStoreFactory(IOptions<StateOptions> options, IServiceProvider 
         CreateCore<T>((_, _, ct) => factory(ct), configureOptions);
 
     public StateStore<T> Create<T>(Func<LoadingState, CancellationToken, ValueTask<T>> factory, Action<StateOptions>? configureOptions = null) =>
-        CreateCore<T>((_, state, ct) => factory(state, ct), configureOptions);
+        CreateCore<T>((_, state, ct) => factory(state, ct), EnableProgress(configureOptions));
 
     public StateStore<T> Create<T>(T value, Action<StateOptions>? configureOptions = null) =>
         CreateCore<T>((_, _, _) => ValueTask.FromResult(value), configureOptions);
@@ -58,5 +58,12 @@ public class StateStoreFactory(IOptions<StateOptions> options, IServiceProvider 
             var opts = new StateOptions { Timeout = options.Value.Timeout };
             configure?.Invoke(opts);
             return opts;
+        };
+
+    private Action<StateOptions> EnableProgress(Action<StateOptions>? configure) =>
+        x =>
+        {
+            configure?.Invoke(x);
+            x.IsProgressSupported = true;
         };
 }

@@ -18,10 +18,10 @@
                     @_renderState?.Invoke(_state)
                 </Authorized>
                 <Authorizing>
-                    @_renderLoading?.Invoke(new LoadingState(new StateContext(_timeProvider.GetUtcNow())))
+                    @_renderLoading?.Invoke(LoadingStateViewData.FromState(Store.NewLoadingState(), _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
                 </Authorizing>
                 <NotAuthorized>
-                    @_renderUnauthorized?.Invoke(new UnauthorizedState(context.User, Resource, new AuthorizeData(Policy, Roles), new StateContext(_timeProvider.GetUtcNow())))
+                    @_renderUnauthorized?.Invoke(new UnauthorizedStateViewData(context.User, Resource, new AuthorizeData(Policy, Roles), _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
                 </NotAuthorized>
             </AuthorizeView>
         }
@@ -31,20 +31,20 @@
         }
     </ChildContent>
     <ErrorContent>
-        @_renderError?.Invoke(new ErrorState(context, new StateContext(_timeProvider.GetUtcNow())))
+        @_renderError?.Invoke(new ErrorStateViewData(context, _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
     </ErrorContent>
 </ErrorBoundary>
 
 @code {
-    
+
     private readonly TimeProvider _timeProvider;
 
-    private State? _state;
+    private StateViewData? _state;
 
-    private readonly RenderFragment<State?>? _renderState;
-    private readonly RenderFragment<ErrorState>? _renderError;
-    private readonly RenderFragment<UnauthorizedState>? _renderUnauthorized;
-    private readonly RenderFragment<LoadingState>? _renderLoading;
+    private readonly RenderFragment<StateViewData?>? _renderState;
+    private readonly RenderFragment<ErrorStateViewData>? _renderError;
+    private readonly RenderFragment<UnauthorizedStateViewData>? _renderUnauthorized;
+    private readonly RenderFragment<LoadingStateViewData>? _renderLoading;
 
     public StateViewWithParameters(TimeProvider timeProvider)
     {
@@ -58,11 +58,11 @@
             x =>
                 x switch
                 {
-                    SuccessState<T> successState => SuccessContent?.Invoke(successState) ?? SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(successState.Value, successState.Context)) ?? ChildContent?.Invoke(successState) ?? throw new InvalidOperationException($"State view must have either {nameof(SuccessContent)}, {nameof(SuccessOrNotFoundContent)} or {nameof(ChildContent)} defined."),
-                    NotFoundState notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(default, notFound.Context)) ?? NotFoundContent?.Invoke(notFound) ?? Options.Value.DefaultNotFoundContent?.Invoke(notFound),
-                    ErrorState errorState => _renderError(errorState),
-                    TimedOutState timedOutState => TimedOutContent?.Invoke(timedOutState) ?? Options.Value.DefaultTimedOutContent?.Invoke(timedOutState),
-                    LoadingState loadingState => _renderLoading(loadingState),
+                    SuccessStateViewData<T> successState => SuccessContent?.Invoke(successState) ?? SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundStateViewData<T>(successState, null)) ?? ChildContent?.Invoke(successState) ?? throw new InvalidOperationException($"State view must have either {nameof(SuccessContent)}, {nameof(SuccessOrNotFoundContent)} or {nameof(ChildContent)} defined."),
+                    NotFoundStateViewData notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundStateViewData<T>(null, notFound)) ?? NotFoundContent?.Invoke(notFound) ?? Options.Value.DefaultNotFoundContent?.Invoke(notFound),
+                    ErrorStateViewData errorState => _renderError(errorState),
+                    TimedOutStateViewData timedOutState => TimedOutContent?.Invoke(timedOutState) ?? Options.Value.DefaultTimedOutContent?.Invoke(timedOutState),
+                    LoadingStateViewData loadingState => _renderLoading(loadingState),
                     _ => throw new UnreachableException()
                 }
                 ?? StateDefaults.DefaultContent.Empty;
@@ -86,35 +86,35 @@
                     return;
                 default:
                     field = value;
-                    InvokeAsync(() => LoadStoreWithStateHandler(field));
+                    InvokeAsync(LoadStoreWithStateHandler);
                     return;
             }
         }
     } = default!;
 
     [Parameter]
-    public RenderFragment<SuccessState<T>>? ChildContent { get; set; }
+    public RenderFragment<SuccessStateViewData<T>>? ChildContent { get; set; }
 
     [Parameter]
-    public RenderFragment<SuccessState<T>>? SuccessContent { get; set; }
+    public RenderFragment<SuccessStateViewData<T>>? SuccessContent { get; set; }
 
     [Parameter]
-    public RenderFragment<SuccessOrNotFoundState<T>>? SuccessOrNotFoundContent { get; set; }
+    public RenderFragment<SuccessOrNotFoundStateViewData<T>>? SuccessOrNotFoundContent { get; set; }
 
     [Parameter]
-    public RenderFragment<LoadingState>? LoadingContent { get; set; }
+    public RenderFragment<LoadingStateViewData>? LoadingContent { get; set; }
 
     [Parameter]
-    public RenderFragment<TimedOutState>? TimedOutContent { get; set; }
+    public RenderFragment<TimedOutStateViewData>? TimedOutContent { get; set; }
 
     [Parameter]
-    public RenderFragment<ErrorState>? ErrorContent { get; set; }
+    public RenderFragment<ErrorStateViewData>? ErrorContent { get; set; }
 
     [Parameter]
-    public RenderFragment<NotFoundState>? NotFoundContent { get; set; }
+    public RenderFragment<NotFoundStateViewData>? NotFoundContent { get; set; }
 
     [Parameter]
-    public RenderFragment<UnauthorizedState>? UnauthorizedContent { get; set; }
+    public RenderFragment<UnauthorizedStateViewData>? UnauthorizedContent { get; set; }
 
     [Parameter]
     public string? Policy { get; set; }
@@ -137,7 +137,7 @@
     {
         if (InitialLoadEvent is StateInitialLoadEvent.OnInitialized)
         {
-            LoadStoreWithStateHandler(Parameters);
+            LoadStoreWithStateHandler();
         }
     }
 
@@ -145,7 +145,7 @@
     {
         if (InitialLoadEvent is StateInitialLoadEvent.OnParametersSet)
         {
-            LoadStoreWithStateHandler(Parameters);
+            LoadStoreWithStateHandler();
         }
     }
 
@@ -153,37 +153,35 @@
     {
         if (firstRender && InitialLoadEvent is StateInitialLoadEvent.OnAfterRender)
         {
-            {
-                LoadStoreWithStateHandler(Parameters);
-            }
+            LoadStoreWithStateHandler();
         }
     }
 
-    private void LoadStoreWithStateHandler(TParameters parameters)
+    private void LoadStoreWithStateHandler()
     {
         Store.StateChanged -= OnStateChanged;
         Store.StateChanged += OnStateChanged;
 
-        _ = Store.LoadAsync(parameters);
+        _ = Store.LoadAsync(Parameters);
 
         return;
 
         void OnStateChanged(object? _, State state)
         {
-            _state = state;
+            _state = StateViewData.FromState<T>(state, _timeProvider.GetUtcNow(), LoadStoreWithStateHandler);
             InvokeAsync(StateHasChanged);
         }
     }
-    
-    public bool TryGetCurrentState<TState>([NotNullWhen(true)] out TState currentState) where TState : State
+
+    public bool TryGetCurrentState<TViewData>([NotNullWhen(true)] out TViewData currentViewData) where TViewData : StateViewData
     {
-        if (_state is TState state)
+        if (_state is TViewData viewData)
         {
-            currentState = state;
+            currentViewData = viewData;
             return true;
         }
 
-        currentState = null!;
+        currentViewData = null!;
         return false;
     }
 

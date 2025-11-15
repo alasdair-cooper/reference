@@ -7,25 +7,25 @@
     {
         public static readonly RenderFragment Empty = @<text></text>;
         
-        public static readonly RenderFragment<LoadingState> Loading = _ => @<span>Loading...</span>;
+        public static readonly RenderFragment<LoadingStateViewData> Loading = _ => @<span>Loading...</span>;
 
-        public static readonly RenderFragment<TimedOutState> TimedOut =
+        public static readonly RenderFragment<TimedOutStateViewData> TimedOut =
             x =>
                 @<Alert Level="AlertLevel.Error">
                     Timed out after @x.Timeout.Humanize()
                 </Alert>;
 
-        public static readonly RenderFragment<ErrorState> Error =
+        public static readonly RenderFragment<ErrorStateViewData> Error =
             x =>
                 @<ErrorSummary Exception="x.Exception" />;
 
-        public static readonly RenderFragment<NotFoundState> NotFound =
+        public static readonly RenderFragment<NotFoundStateViewData> NotFound =
             _ =>
                 @<Alert Level="AlertLevel.Warning">
                     Item not found.
                 </Alert>;
 
-        public static readonly RenderFragment<UnauthorizedState> Unauthorized =
+        public static readonly RenderFragment<UnauthorizedStateViewData> Unauthorized =
             x =>
                 @<AuthorizationSummary
                     User="x.User"
