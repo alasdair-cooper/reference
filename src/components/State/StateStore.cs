@@ -18,7 +18,7 @@ public class StateStore<T> : StateStore<object, T>
 }
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-public class StateStore<TParameters, T>
+public partial class StateStore<TParameters, T>
 {
     private readonly Func<StateOptions> _buildOptions;
     private readonly StateOptions _options;
@@ -45,7 +45,7 @@ public class StateStore<TParameters, T>
 
         State = NewLoadingState();
     }
-    
+
     private State State
     {
         get;
@@ -55,7 +55,7 @@ public class StateStore<TParameters, T>
             StateChanged?.Invoke(this, value);
         }
     }
-    
+
     internal LoadingState NewLoadingState() =>
         _options.IsProgressSupported ? new LoadingState(_timeProvider.GetUtcNow(), x => State = x, 0) : new LoadingState(_timeProvider.GetUtcNow());
 
@@ -94,15 +94,13 @@ public class StateStore<TParameters, T>
                         stopwatch.Stop();
                         return res;
                     });
-            
-            _logger.LogTrace("State loaded in {Elapsed}", stopwatch.Elapsed);
+
+            LogStateLoaded(stopwatch.Elapsed);
 
             State =
-                res switch
-                {
-                    not null => new SuccessState<T>(res, _timeProvider.GetUtcNow(), stopwatch.Elapsed),
-                    null => new NotFoundState(_timeProvider.GetUtcNow(), stopwatch.Elapsed)
-                };
+                res is not null
+                    ? new SuccessState<T>(res, _timeProvider.GetUtcNow(), stopwatch.Elapsed)
+                    : new NotFoundState(_timeProvider.GetUtcNow(), stopwatch.Elapsed);
         }
         catch (OperationCanceledException ex)
         {
@@ -111,7 +109,7 @@ public class StateStore<TParameters, T>
         catch (Exception ex)
         {
             State = new ErrorState(ex);
-            _logger.LogError(ex, "An error occurred while loading state.");
+            LogErrorLoadingState(ex);
         }
         finally
         {
@@ -126,4 +124,10 @@ public class StateStore<TParameters, T>
         configureOptions?.Invoke(opts);
         return Microsoft.Extensions.Options.Options.Create(opts);
     }
+
+    [LoggerMessage(LogLevel.Trace, "State loaded in {Elapsed}")]
+    partial void LogStateLoaded(TimeSpan elapsed);
+
+    [LoggerMessage(LogLevel.Error, "An error occurred while loading state.")]
+    partial void LogErrorLoadingState(Exception ex);
 }
