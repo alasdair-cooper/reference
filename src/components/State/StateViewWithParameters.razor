@@ -63,6 +63,7 @@
                     ErrorStateViewData errorState => _renderError(errorState),
                     TimedOutStateViewData timedOutState => TimedOutContent?.Invoke(timedOutState) ?? Options.Value.DefaultTimedOutContent?.Invoke(timedOutState),
                     LoadingStateViewData loadingState => _renderLoading(loadingState),
+                    null => StateDefaults.DefaultContent.Empty,
                     _ => throw new UnreachableException()
                 }
                 ?? StateDefaults.DefaultContent.Empty;

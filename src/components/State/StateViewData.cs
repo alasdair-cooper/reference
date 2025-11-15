@@ -32,12 +32,7 @@ public sealed record SuccessStateViewData<T>(
     DateTimeOffset RenderedAt,
     Action Reload) : StateViewData(RenderedAt, Reload);
 
-public sealed record SuccessOrNotFoundStateViewData<T>(SuccessStateViewData<T>? Success, NotFoundStateViewData? NotFound)
-{
-    public bool IsSuccess => Success is not null;
-
-    public bool IsNotFound => NotFound is not null;
-}
+public sealed record SuccessOrNotFoundStateViewData<T>(SuccessStateViewData<T>? Success, NotFoundStateViewData? NotFound);
 
 public sealed record LoadingStateViewData(double? Progress, DateTimeOffset RenderedAt, Action Reload) : StateViewData(RenderedAt, Reload)
 {

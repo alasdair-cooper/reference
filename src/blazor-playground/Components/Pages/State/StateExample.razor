@@ -1,5 +1,8 @@
-﻿@using AlasdairCooper.Reference.BlazorPlayground.Utilities
+﻿@using System.Text.Json
+@using AlasdairCooper.Reference.BlazorPlayground.Utilities
 @using AlasdairCooper.Reference.Components.State
+
+@inject IJSRuntime JSRuntime
 
 @page "/state"
 
@@ -8,13 +11,14 @@
 <h2>From Value</h2>
 
 <StateView Store="_fromValueStateStore">
-    @context.Value.ToDisplayString() 
+    @context.Value.ToDisplayString()
 </StateView>
 
 <h2>From Factory</h2>
 
 <StateView Store="_fromFactoryStateStore">
-    @context.Value.ToDisplayString() Loaded at @context.LoadedAt.ToString("HH:mm:ss.ffffff") in @context.LoadedIn.TotalMilliseconds ms, rendered at @context.RenderedAt.ToString("HH:mm:ss.ffffff")
+    @context.Value.ToDisplayString() Loaded at @context.LoadedAt.ToString("HH:mm:ss.ffffff") in @context.LoadedIn.TotalMilliseconds ms, rendered
+    at @context.RenderedAt.ToString("HH:mm:ss.ffffff")
     <button @onclick="@context.Reload">Reload</button>
 </StateView>
 
@@ -34,15 +38,46 @@
     @context.Value.ToDisplayString()
 </StateView>
 
+<h2>From Factory (<code>localStorage</code> after render)</h2>
+
+<StateView
+    Store="_fromLocalStorageStateStore">
+    @* InitialLoadEvent="StateInitialLoadEvent.OnAfterRender"> *@
+    @context.Value.ToDisplayString()
+</StateView>
+
 @code {
 
     private readonly StateStore<User> _fromValueStateStore;
     private readonly StateStore<User> _fromFactoryStateStore;
+    private readonly StateStore<User> _fromLocalStorageStateStore;
 
     public StateExample(StateStoreFactory stateStoreFactory)
     {
         _fromValueStateStore = stateStoreFactory.Create(GetUser());
         _fromFactoryStateStore = stateStoreFactory.Create(() => GetUser());
+
+        _fromLocalStorageStateStore =
+            stateStoreFactory.Create(
+                async () =>
+                {
+                    var localStorage = await JSRuntime.GetValueAsync<IJSObjectReference>("window.localStorage");
+                    var userJson = await localStorage.InvokeAsync<string>("getItem", "user");
+                    User user;
+
+                    if (string.IsNullOrEmpty(userJson))
+                    {
+                        user = GetUser();
+                        userJson = JsonSerializer.Serialize(user);
+                        await localStorage.InvokeVoidAsync("setItem", "user", userJson);
+                    }
+                    else
+                    {
+                        user = JsonSerializer.Deserialize<User>(userJson)!;
+                    }
+
+                    return user;
+                });
     }
 
     private static User GetUser(int index = 0) => UserGenerator.Users.Skip(index).First();
