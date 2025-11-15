@@ -1,43 +1,7 @@
-﻿@using Microsoft.Extensions.Logging
-@using Microsoft.Extensions.Options
-
-@typeparam T
+﻿@typeparam T
 
 @inherits StateViewWithParameters<object, T>
 
-<ErrorBoundary>
-    <ChildContent>
-        @if (Policy is not null || Roles is not null || Resource is not null)
-        {
-            <AuthorizeView
-                Policy="@Policy"
-                Roles="@Roles"
-                Resource="@Resource">
-                <Authorized>
-                    @RenderState(State)
-                </Authorized>
-                <Authorizing>
-                    @RenderLoading(new LoadingState())
-                </Authorizing>
-                <NotAuthorized>
-                    @RenderUnauthorized(context)
-                </NotAuthorized>
-            </AuthorizeView>
-        }
-        else
-        {
-            @RenderState(State)
-        }
-    </ChildContent>
-    <ErrorContent>
-        @RenderError(new ErrorState(context))
-    </ErrorContent>
-</ErrorBoundary>
-
-@code {
-
-    protected override void OnInitialized() => LoadStoreWithStateHandler(null!);
-
-    public StateView(IOptions<StateOptions> options, ILogger<StateView<T>> logger) : base(options, logger) { }
-
+@{
+    base.BuildRenderTree(__builder);
 }

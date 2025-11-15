@@ -7,7 +7,7 @@ namespace AlasdairCooper.Reference.Components.State;
 public abstract record State;
 
 public sealed record SuccessState<T>(
-    [NotNull]
+    [property: MemberNotNull]
     T Value) : State;
 
 public sealed record SuccessOrNotFoundState<T>(T? Value);

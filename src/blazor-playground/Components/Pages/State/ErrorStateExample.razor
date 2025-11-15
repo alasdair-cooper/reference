@@ -1,0 +1,39 @@
+@using AlasdairCooper.Reference.BlazorPlayground.Utilities
+@using AlasdairCooper.Reference.Components.State
+
+@page "/state/error"
+
+<h1>Error State</h1>
+
+<h2>From Factory (with error in factory)</h2>
+
+<StateView Store="_fromFactoryWithErrorStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (with error in component)</h2>
+
+<StateView Store="_fromFactoryStateStore">
+    @_throwingFragment
+    @context.Value.ToDisplayString()
+</StateView>
+
+@code {
+
+    private readonly RenderFragment _throwingFragment =
+        @<span>
+            @{ throw new InvalidOperationException("Something went wrong in this component."); }
+        </span>;
+
+    private readonly StateStore<User> _fromFactoryStateStore;
+    private readonly StateStore<User> _fromFactoryWithErrorStateStore;
+
+    public ErrorStateExample(StateStoreFactory stateStoreFactory)
+    {
+        _fromFactoryStateStore = stateStoreFactory.Create(() => GetUser());
+        _fromFactoryWithErrorStateStore = stateStoreFactory.Create(User () => throw new InvalidOperationException("Something went wrong in this factory.", new AggregateException("This is an inner exception.")));
+    }
+
+    private static User GetUser(int index = 0) => UserGenerator.Users.Skip(index).First();
+
+}

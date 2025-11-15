@@ -1,0 +1,54 @@
+@using AlasdairCooper.Reference.Components.State
+
+@inherits Select<T>
+
+@typeparam T
+
+<Select
+    Value="Value"
+    ValueChanged="ValueChanged"
+    Label="@Label"
+    Color="Color">
+    <StateView
+        Store="Store"
+        T="IEnumerable<T>"
+        ConfigureOptions="static x => x.DisableDefaultContent()">
+        <SuccessContent>
+            @if (!IsNeverEmpty)
+            {
+                <Option Value="default(T)">
+                    @EmptyContent
+                </Option>
+            }
+            @foreach (var item in context.Value)
+            {
+                <Option Value="item">
+                    @OptionContent?.Invoke(item)
+                </Option>
+            }
+        </SuccessContent>
+    </StateView>
+</Select>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public required StateStore<IEnumerable<T>> Store { get; set; }
+
+    private RenderFragment<T> OptionTextContent =>
+        x =>
+            @<span>@x</span>;
+
+    [Parameter]
+    public RenderFragment<T>? OptionContent { get => field ?? OptionTextContent; set; }
+
+    private RenderFragment EmptyTextContent => @<span></span>;
+
+    [Parameter]
+    public RenderFragment? EmptyContent { get => field ?? EmptyTextContent; set; }
+
+    [Parameter]
+    public bool IsNeverEmpty { get; set; }
+
+}

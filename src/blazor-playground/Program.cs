@@ -1,5 +1,6 @@
 using AlasdairCooper.Reference.Components.Dialog;
 using AlasdairCooper.Reference.BlazorPlayground.Components;
+using AlasdairCooper.Reference.BlazorPlayground.Utilities;
 using AlasdairCooper.Reference.Components.Inputs;
 using AlasdairCooper.Reference.Components.State;
 
@@ -13,6 +14,10 @@ builder.Services.AddState();
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorizationBuilder().AddPolicy("test", x => x.RequireRole("test"));
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton<PageService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,70 @@
+@using AlasdairCooper.Reference.BlazorPlayground.Utilities
+@using AlasdairCooper.Reference.Components.State
+
+@page "/state/parameters"
+
+<h1>States</h1>
+
+<h2>From Factory (with <code>int</code> param)</h2>
+
+<button @onclick="@(() => _count = _count > 0 ? _count - 1 : _count)">Prev</button>
+
+<StateViewWithParameters
+    Store="_fromFactoryWithIntParamStateStore"
+    Parameters="_count">
+    @context.Value.ToDisplayString()
+</StateViewWithParameters>
+
+<button @onclick="@(() => _count++)">Next</button>
+
+<h2>From Factory (with <code>record</code> param)</h2>
+
+<button @onclick="@(() => _countRecord = new CountRecord(Math.Min(0, _countRecord.Count - 1)))">Prev</button>
+
+<StateViewWithParameters
+    Store="_fromFactoryWithRecordParamStateStore"
+    Parameters="_countRecord">
+    @context.Value.ToDisplayString()
+</StateViewWithParameters>
+
+<button @onclick="@(() => _countRecord = new CountRecord(_countRecord.Count + 1))">Next</button>
+
+<h2>From Factory (with <code>class</code> param)</h2>
+
+<button @onclick="@(() => _countClass.Count = _count > 0 ? _count - 1 : _count)">Prev</button>
+
+<StateViewWithParameters
+    Store="_fromFactoryWithClassParamStateStore"
+    Parameters="_countClass">
+    @context.Value.ToDisplayString()
+</StateViewWithParameters>
+
+<button @onclick="@(() => _countClass.Count += 1)">Next</button>
+
+@code {
+
+    int _count;
+    CountClass _countClass = new();
+    CountRecord _countRecord = new(0);
+
+    private readonly StateStore<int, User> _fromFactoryWithIntParamStateStore;
+    private readonly StateStore<CountRecord, User> _fromFactoryWithRecordParamStateStore;
+    private readonly StateStore<CountClass, User> _fromFactoryWithClassParamStateStore;
+
+    public StateWithParametersExample(StateStoreFactory stateStoreFactory)
+    {
+        _fromFactoryWithIntParamStateStore = stateStoreFactory.Create<int, User>(GetUser);
+        _fromFactoryWithRecordParamStateStore = stateStoreFactory.Create<CountRecord, User>(x => GetUser(x.Count));
+        _fromFactoryWithClassParamStateStore = stateStoreFactory.Create<CountClass, User>(x => GetUser(x.Count));
+    }
+
+    private static User GetUser(int index = 0) => UserGenerator.Users.Skip(index).First();
+
+    private class CountClass
+    {
+        public int Count { get; set; }
+    }
+
+    private record CountRecord(int Count);
+
+}

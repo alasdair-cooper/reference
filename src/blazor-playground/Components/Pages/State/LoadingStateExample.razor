@@ -1,0 +1,51 @@
+@using AlasdairCooper.Reference.BlazorPlayground.Utilities
+@using AlasdairCooper.Reference.Components.State
+
+@page "/state/loading"
+
+<h1>Loading State</h1>
+
+<h2>From Factory (with delay)</h2>
+
+<StateView Store="_fromFactoryWithDelayStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<button @onclick="() => _fromFactoryWithDelayStateStore.LoadAsync()">Reload</button>
+
+<h2>From Factory (with delay & timeout)</h2>
+
+<StateView Store="_fromFactoryWithDelayAndTimeoutStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<button @onclick="() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync()">Reload</button>
+
+@code {
+
+    private readonly StateStore<User> _fromFactoryWithDelayStateStore;
+    private readonly StateStore<User> _fromFactoryWithDelayAndTimeoutStateStore;
+
+    public LoadingStateExample(StateStoreFactory stateStoreFactory)
+    {
+        _fromFactoryWithDelayStateStore =
+            stateStoreFactory.Create(
+                async () =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(3));
+                    return GetUser();
+                });
+
+        _fromFactoryWithDelayAndTimeoutStateStore =
+            stateStoreFactory.Create(
+                async ct =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(3), ct);
+                    return GetUser();
+                },
+                x => x.Timeout = TimeSpan.FromSeconds(1));
+    }
+
+    private static User GetUser(int index = 0) => UserGenerator.Users.Skip(index).First();
+
+}

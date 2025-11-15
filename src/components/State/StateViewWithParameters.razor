@@ -1,5 +1,5 @@
-﻿@using System.ComponentModel
-@using Microsoft.Extensions.Logging
+﻿@using System.Collections
+@using System.Diagnostics.CodeAnalysis
 @using Microsoft.Extensions.Options
 
 @typeparam TParameters
@@ -14,57 +14,53 @@
                 Roles="@Roles"
                 Resource="@Resource">
                 <Authorized>
-                    @RenderState(State)
+                    @_renderState?.Invoke(_state)
                 </Authorized>
                 <Authorizing>
-                    @RenderLoading(new LoadingState())
+                    @_renderLoading?.Invoke(new LoadingState())
                 </Authorizing>
                 <NotAuthorized>
-                    @RenderUnauthorized(context)
+                    @_renderUnauthorized?.Invoke(context)
                 </NotAuthorized>
             </AuthorizeView>
         }
         else
         {
-            @RenderState(State)
+            @_renderState?.Invoke(_state)
         }
     </ChildContent>
     <ErrorContent>
-        @RenderError(new ErrorState(context))
+        @_renderError?.Invoke(new ErrorState(context))
     </ErrorContent>
 </ErrorBoundary>
 
 @code {
-    private readonly ILogger<StateViewWithParameters<TParameters, T>> _logger;
 
-    private bool _hasLoadedAtLeastOnce;
+    private State? _state;
 
-    protected State? State;
+    private readonly RenderFragment<State?>? _renderState;
+    private readonly RenderFragment<ErrorState>? _renderError;
+    private readonly RenderFragment<AuthenticationState>? _renderUnauthorized;
+    private readonly RenderFragment<LoadingState>? _renderLoading;
 
-    protected readonly RenderFragment<State?> RenderState;
-    protected readonly RenderFragment<ErrorState> RenderError;
-    protected readonly RenderFragment<AuthenticationState> RenderUnauthorized;
-    protected readonly RenderFragment<LoadingState> RenderLoading;
-
-    public StateViewWithParameters(IOptions<StateOptions> stateOptions, ILogger<StateViewWithParameters<TParameters, T>> logger)
+    public StateViewWithParameters()
     {
-        _logger = logger;
+        _renderError = x => ErrorContent?.Invoke(x) ?? Options.Value.DefaultErrorContent?.Invoke(x) ?? StateDefaults.DefaultContent.Empty;
+        _renderUnauthorized = x => UnauthorizedContent?.Invoke(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles))) ?? Options.Value.DefaultUnauthorizedContent?.Invoke(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles))) ?? StateDefaults.DefaultContent.Empty;
+        _renderLoading = x => LoadingContent?.Invoke(x) ?? Options.Value.DefaultLoadingContent?.Invoke(x) ?? StateDefaults.DefaultContent.Empty;
 
-        RenderError = x => ErrorContent?.Invoke(x) ?? stateOptions.Value.DefaultErrorContent(x);
-        RenderUnauthorized = x => UnauthorizedContent?.Invoke(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles))) ?? stateOptions.Value.DefaultUnauthorizedContent(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles)));
-        RenderLoading = x => LoadingContent?.Invoke(x) ?? stateOptions.Value.DefaultLoadingContent(x);
-
-        RenderState =
+        _renderState =
             x =>
                 x switch
                 {
                     SuccessState<T> successState => SuccessContent?.Invoke(successState) ?? SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(successState.Value)) ?? ChildContent?.Invoke(successState) ?? throw new InvalidOperationException($"State view must have either {nameof(SuccessContent)}, {nameof(SuccessOrNotFoundContent)} or {nameof(ChildContent)} defined."),
-                    NotFoundState notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(default)) ?? NotFoundContent?.Invoke(notFound) ?? stateOptions.Value.DefaultNotFoundContent(notFound),
-                    ErrorState errorState => RenderError(errorState),
-                    TimedOutState timedOutState => TimedOutContent?.Invoke(timedOutState) ?? stateOptions.Value.DefaultTimedOutContent(timedOutState),
-                    LoadingState loadingState => RenderLoading(loadingState),
-                    _ => RenderLoading(new LoadingState())
-                };
+                    NotFoundState notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(default)) ?? NotFoundContent?.Invoke(notFound) ?? Options.Value.DefaultNotFoundContent?.Invoke(notFound),
+                    ErrorState errorState => _renderError(errorState),
+                    TimedOutState timedOutState => TimedOutContent?.Invoke(timedOutState) ?? Options.Value.DefaultTimedOutContent?.Invoke(timedOutState),
+                    LoadingState loadingState => _renderLoading(loadingState),
+                    _ => _renderLoading(new LoadingState())
+                }
+                ?? StateDefaults.DefaultContent.Empty;
     }
 
     [Parameter]
@@ -77,49 +73,16 @@
         get;
         set
         {
-            if (!ShouldRun()) return;
-
-            // If the parameter type implements `INotifyPropertyChanged`, only run the setter once
-            if (_hasLoadedAtLeastOnce && field is INotifyPropertyChanged) return;
-
-            _hasLoadedAtLeastOnce = true;
-            field = value;
-            LoadStoreWithStateHandler(field);
-
-            // Parameters implementing `INotifyPropertyChanged` trigger state reloading themselves 
-            if (field is INotifyPropertyChanged notifyPropertyChanged)
+            switch (value, field)
             {
-                notifyPropertyChanged.PropertyChanged +=
-                    (@object, _) =>
-                    {
-                        field = (TParameters)@object!;
-                        LoadStoreWithStateHandler(field);
-                    };
-            }
-
-            return;
-
-            bool ShouldRun()
-            {
-                // Always set the parameter value the first time the setter is called
-                if (!_hasLoadedAtLeastOnce)
-                {
-                    return true;
-                }
-
-                switch (value, field)
-                {
-                    case (null, null):
-                        return false;
-                    case (null, not null) or (not null, null):
-                        return true;
-                    case (IEquatable<TParameters> a, IEquatable<TParameters> b):
-                        return !a.Equals(b);
-                    default:
-                        _logger.LogWarning($"State views with reference type parameters reload more frequently than necessary. Consider implementing {nameof(IEquatable<>)} or {nameof(INotifyPropertyChanged)} for {nameof(TParameters)}.");
-                        // Reference types always trigger the value to be updated as there is no way to tell if there's been a change or not
-                        return true;
-                }
+                case (null, null):
+                case (IStructuralEquatable a, IStructuralEquatable b) when a.Equals(b):
+                case (IEquatable<TParameters> c, IEquatable<TParameters> d) when c.Equals(d):
+                    return;
+                default:
+                    field = value;
+                    InvokeAsync(() => LoadStoreWithStateHandler(field));
+                    return;
             }
         }
     } = default!;
@@ -157,19 +120,66 @@
     [Parameter]
     public object? Resource { get; set; }
 
-    protected void LoadStoreWithStateHandler(TParameters parameters)
+    [Parameter]
+    public Action<StateOptions>? ConfigureOptions { get; set; }
+
+    [Parameter]
+    public StateInitialLoadEvent InitialLoadEvent { get; set; } = StateInitialLoadEvent.OnInitialized;
+
+    private IOptions<StateOptions> Options => Store.Options(ConfigureOptions);
+
+    protected override void OnInitialized()
+    {
+        if (InitialLoadEvent is StateInitialLoadEvent.OnInitialized)
+        {
+            LoadStoreWithStateHandler(Parameters);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (InitialLoadEvent is StateInitialLoadEvent.OnParametersSet)
+        {
+            LoadStoreWithStateHandler(Parameters);
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && InitialLoadEvent is StateInitialLoadEvent.OnAfterRender)
+        {
+            {
+                LoadStoreWithStateHandler(Parameters);
+            }
+        }
+    }
+
+    private void LoadStoreWithStateHandler(TParameters parameters)
     {
         Store.StateChanged -= OnStateChanged;
         Store.StateChanged += OnStateChanged;
+
         _ = Store.LoadAsync(parameters);
 
         return;
 
         void OnStateChanged(object? _, State state)
         {
-            State = state;
+            _state = state;
             InvokeAsync(StateHasChanged);
         }
+    }
+    
+    public bool TryGetCurrentState<TState>([NotNullWhen(true)] out TState currentState) where TState : State
+    {
+        if (_state is TState state)
+        {
+            currentState = state;
+            return true;
+        }
+
+        currentState = null!;
+        return false;
     }
 
 }

@@ -5,6 +5,8 @@
 
     public static class DefaultContent
     {
+        public static readonly RenderFragment Empty = @<text></text>;
+        
         public static readonly RenderFragment<LoadingState> Loading = _ => @<span>Loading...</span>;
 
         public static readonly RenderFragment<TimedOutState> TimedOut =

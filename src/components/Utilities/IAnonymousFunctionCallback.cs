@@ -1,0 +1,3 @@
+namespace AlasdairCooper.Reference.Components.Utilities;
+
+public interface IAnonymousFunctionCallback;

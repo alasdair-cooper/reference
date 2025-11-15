@@ -46,10 +46,11 @@ public class StateStoreFactory(IOptions<StateOptions> options, ILoggerFactory lo
     public StateStore<T> Create<T>(T value, Action<StateOptions>? configureOptions = null) =>
         new(loggerFactory.CreateLogger(nameof(StateStore<>)), (_, _) => ValueTask.FromResult(value), GetOptions(configureOptions));
 
-    private StateOptions GetOptions(Action<StateOptions>? configure = null)
-    {
-        var opts = new StateOptions { Timeout = options.Value.Timeout };
-        configure?.Invoke(opts);
-        return opts;
-    }
+    private Func<StateOptions> GetOptions(Action<StateOptions>? configure = null) =>
+        () =>
+        {
+            var opts = new StateOptions { Timeout = options.Value.Timeout };
+            configure?.Invoke(opts);
+            return opts;
+        };
 }

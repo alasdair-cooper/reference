@@ -1,0 +1,50 @@
+﻿@using AlasdairCooper.Reference.BlazorPlayground.Utilities
+@using AlasdairCooper.Reference.Components.State
+
+@page "/state"
+
+<h1>States</h1>
+
+<h2>From Value</h2>
+
+<StateView Store="_fromValueStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory</h2>
+
+<StateView Store="_fromFactoryStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (missing role)</h2>
+
+<StateView
+    Store="_fromFactoryStateStore"
+    Roles="test">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<h2>From Factory (policy fails)</h2>
+
+<StateView
+    Store="_fromFactoryStateStore"
+    Policy="test">
+    @context.Value.ToDisplayString()
+</StateView>
+
+@code {
+
+    private readonly StateStore<User> _fromValueStateStore;
+    private readonly StateStore<User> _fromFactoryStateStore;
+
+    public StateExample(StateStoreFactory stateStoreFactory)
+    {
+        _fromValueStateStore = stateStoreFactory.Create(GetUser());
+
+        _fromFactoryStateStore = stateStoreFactory.Create(() => GetUser());
+    }
+
+    private static User GetUser(int index = 0) => UserGenerator.Users.Skip(index).First();
+
+}
