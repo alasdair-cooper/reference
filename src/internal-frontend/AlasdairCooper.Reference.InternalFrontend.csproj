@@ -10,10 +10,10 @@
 
     <ItemGroup>
         <PackageReference Include="Aspire4Wasm.WebAssembly" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.7"/>
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="9.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.7" PrivateAssets="all"/>
-        <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="9.4.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="10.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.0.0" />
     </ItemGroup>
 
     <ItemGroup>
