@@ -1,64 +1,54 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace AlasdairCooper.Reference.Components.State;
 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public class StateStore<T> : StateStore<object, T>
 {
-    public StateStore(ILogger logger, TimeProvider timeProvider, Func<LoadingState, CancellationToken, ValueTask<T>> factory, Func<StateOptions> buildOptions) : base(
-        logger,
-        timeProvider,
-        (_, state, ct) => factory(state, ct),
-        buildOptions) { }
-
-    public StateStore(ILogger logger, TimeProvider timeProvider, Func<CancellationToken, ValueTask<T>> factory, Func<StateOptions> buildOptions) : base(
-        logger,
-        timeProvider,
-        (_, ct) => factory(ct),
-        buildOptions) { }
+    public StateStore(
+        ILogger<StateStore<object, T>> logger,
+        TimeProvider timeProvider,
+        StateLoader<object, T> factory,
+        Func<StateOptions> buildOptions) : base(logger, timeProvider, factory, buildOptions) { }
 
     public async Task LoadAsync() => await LoadAsync(new object());
 }
 
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public class StateStore<TParameters, T>
 {
     private readonly Func<StateOptions> _buildOptions;
     private readonly StateOptions _options;
     private readonly ILogger _logger;
     private readonly TimeProvider _timeProvider;
-    private readonly Func<TParameters, LoadingState, CancellationToken, ValueTask<T>> _factory;
+    private readonly StateLoader<TParameters, T> _factory;
     private readonly bool _supportsProgress;
     private readonly SemaphoreSlim _lock = new(1, 1);
     private CancellationTokenSource? _cts;
 
     public event EventHandler<State>? StateChanged;
 
-    public StateStore(ILogger logger, TimeProvider timeProvider, Func<TParameters, LoadingState, CancellationToken, ValueTask<T>> factory, Func<StateOptions> buildOptions)
+    public StateStore(
+        ILogger<StateStore<TParameters, T>> logger,
+        TimeProvider timeProvider,
+        StateLoader<TParameters, T> factory,
+        Func<StateOptions> buildOptions)
     {
         _logger = logger;
         _timeProvider = timeProvider;
-        
-        State = LoadingState.Zero(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()), NewContext());
+
+        State = LoadingState.Indeterminate(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()), NewContext());
+        // State = LoadingState.Zero(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()), NewContext());
         _buildOptions = buildOptions;
         _options = _buildOptions();
         _factory = factory;
         _supportsProgress = true;
     }
 
-    public StateStore(ILogger logger, TimeProvider timeProvider, Func<TParameters, CancellationToken, ValueTask<T>> factory, Func<StateOptions> buildOptions)
-    {
-        _timeProvider = timeProvider;
-        _logger = logger;
-        
-        State = LoadingState.Indeterminate(() => StateChanged?.Invoke(this, State ?? throw new InvalidOperationException()), NewContext());
-        _buildOptions = buildOptions;
-        _options = _buildOptions();
-        _factory = (@params, _, ct) => factory(@params, ct);
-        _supportsProgress = false;
-    }
-    
     private StateContext NewContext() => new(_timeProvider.GetUtcNow());
-    
+
     private State State
     {
         get;
@@ -87,7 +77,9 @@ public class StateStore<TParameters, T>
 
             await _lock.WaitAsync();
 
-            var loadingState = State as LoadingState ?? new LoadingState(NewContext(), () => StateChanged?.Invoke(this, State), _supportsProgress ? 0 : null);
+            var loadingState =
+                State as LoadingState ?? new LoadingState(NewContext(), () => StateChanged?.Invoke(this, State), _supportsProgress ? 0 : null);
+
             State = loadingState;
 
             _cts = new CancellationTokenSource(_options.Timeout);
@@ -116,7 +108,7 @@ public class StateStore<TParameters, T>
             _cts = null;
         }
     }
-    
+
     public IOptions<StateOptions> Options(Action<StateOptions>? configureOptions)
     {
         var opts = _buildOptions();
