@@ -1,4 +1,5 @@
 ﻿@using System.Collections
+@using System.Diagnostics
 @using System.Diagnostics.CodeAnalysis
 @using Microsoft.Extensions.Options
 
@@ -17,10 +18,10 @@
                     @_renderState?.Invoke(_state)
                 </Authorized>
                 <Authorizing>
-                    @_renderLoading?.Invoke(new LoadingState())
+                    @_renderLoading?.Invoke(new LoadingState(new StateContext(_timeProvider.GetUtcNow())))
                 </Authorizing>
                 <NotAuthorized>
-                    @_renderUnauthorized?.Invoke(context)
+                    @_renderUnauthorized?.Invoke(new UnauthorizedState(context.User, Resource, new AuthorizeData(Policy, Roles), new StateContext(_timeProvider.GetUtcNow())))
                 </NotAuthorized>
             </AuthorizeView>
         }
@@ -30,35 +31,39 @@
         }
     </ChildContent>
     <ErrorContent>
-        @_renderError?.Invoke(new ErrorState(context))
+        @_renderError?.Invoke(new ErrorState(context, new StateContext(_timeProvider.GetUtcNow())))
     </ErrorContent>
 </ErrorBoundary>
 
 @code {
+    
+    private readonly TimeProvider _timeProvider;
 
     private State? _state;
 
     private readonly RenderFragment<State?>? _renderState;
     private readonly RenderFragment<ErrorState>? _renderError;
-    private readonly RenderFragment<AuthenticationState>? _renderUnauthorized;
+    private readonly RenderFragment<UnauthorizedState>? _renderUnauthorized;
     private readonly RenderFragment<LoadingState>? _renderLoading;
 
-    public StateViewWithParameters()
+    public StateViewWithParameters(TimeProvider timeProvider)
     {
+        _timeProvider = timeProvider;
+
         _renderError = x => ErrorContent?.Invoke(x) ?? Options.Value.DefaultErrorContent?.Invoke(x) ?? StateDefaults.DefaultContent.Empty;
-        _renderUnauthorized = x => UnauthorizedContent?.Invoke(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles))) ?? Options.Value.DefaultUnauthorizedContent?.Invoke(new UnauthorizedState(x.User, Resource, new AuthorizeData(Policy, Roles))) ?? StateDefaults.DefaultContent.Empty;
+        _renderUnauthorized = x => UnauthorizedContent?.Invoke(x) ?? Options.Value.DefaultUnauthorizedContent?.Invoke(x) ?? StateDefaults.DefaultContent.Empty;
         _renderLoading = x => LoadingContent?.Invoke(x) ?? Options.Value.DefaultLoadingContent?.Invoke(x) ?? StateDefaults.DefaultContent.Empty;
 
         _renderState =
             x =>
                 x switch
                 {
-                    SuccessState<T> successState => SuccessContent?.Invoke(successState) ?? SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(successState.Value)) ?? ChildContent?.Invoke(successState) ?? throw new InvalidOperationException($"State view must have either {nameof(SuccessContent)}, {nameof(SuccessOrNotFoundContent)} or {nameof(ChildContent)} defined."),
-                    NotFoundState notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(default)) ?? NotFoundContent?.Invoke(notFound) ?? Options.Value.DefaultNotFoundContent?.Invoke(notFound),
+                    SuccessState<T> successState => SuccessContent?.Invoke(successState) ?? SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(successState.Value, successState.Context)) ?? ChildContent?.Invoke(successState) ?? throw new InvalidOperationException($"State view must have either {nameof(SuccessContent)}, {nameof(SuccessOrNotFoundContent)} or {nameof(ChildContent)} defined."),
+                    NotFoundState notFound => SuccessOrNotFoundContent?.Invoke(new SuccessOrNotFoundState<T>(default, notFound.Context)) ?? NotFoundContent?.Invoke(notFound) ?? Options.Value.DefaultNotFoundContent?.Invoke(notFound),
                     ErrorState errorState => _renderError(errorState),
                     TimedOutState timedOutState => TimedOutContent?.Invoke(timedOutState) ?? Options.Value.DefaultTimedOutContent?.Invoke(timedOutState),
                     LoadingState loadingState => _renderLoading(loadingState),
-                    _ => _renderLoading(new LoadingState())
+                    _ => throw new UnreachableException()
                 }
                 ?? StateDefaults.DefaultContent.Empty;
     }

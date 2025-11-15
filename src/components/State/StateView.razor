@@ -5,3 +5,9 @@
 @{
     base.BuildRenderTree(__builder);
 }
+
+@code {
+
+    StateView(TimeProvider timeProvider) : base(timeProvider) { }
+
+}
