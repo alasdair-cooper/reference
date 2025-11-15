@@ -41,7 +41,6 @@
     public StateExample(StateStoreFactory stateStoreFactory)
     {
         _fromValueStateStore = stateStoreFactory.Create(GetUser());
-
         _fromFactoryStateStore = stateStoreFactory.Create(() => GetUser());
     }
 

@@ -7,7 +7,7 @@
 
 <h2>From Factory (with <code>int</code> param)</h2>
 
-<button @onclick="@(() => _count = _count > 0 ? _count - 1 : _count)">Prev</button>
+<button @onclick="@(() => _count = Math.Max(0, _count - 1))">Prev</button>
 
 <StateViewWithParameters
     Store="_fromFactoryWithIntParamStateStore"
@@ -17,9 +17,21 @@
 
 <button @onclick="@(() => _count++)">Next</button>
 
+<h2>From Factory (with <code>(int, string)</code> param)</h2>
+
+<button @onclick="@(() => _countTuple = (Math.Max(0, _countTuple.Item1 - 1), ""))">Prev</button>
+
+<StateViewWithParameters
+    Store="_fromFactoryWithTupleParamStateStore"
+    Parameters="_countTuple">
+    @context.Value.ToDisplayString() (Loaded at @context.Context.LastLoadedAt.ToString("T")
+</StateViewWithParameters>
+
+<button @onclick="@(() => _countTuple = (_countTuple.Item1 + 1, ""))">Next</button>
+
 <h2>From Factory (with <code>record</code> param)</h2>
 
-<button @onclick="@(() => _countRecord = new CountRecord(Math.Min(0, _countRecord.Count - 1)))">Prev</button>
+<button @onclick="@(() => _countRecord = new CountRecord(Math.Max(0, _countRecord.Count - 1)))">Prev</button>
 
 <StateViewWithParameters
     Store="_fromFactoryWithRecordParamStateStore"
@@ -31,7 +43,7 @@
 
 <h2>From Factory (with <code>class</code> param)</h2>
 
-<button @onclick="@(() => _countClass.Count = _count > 0 ? _count - 1 : _count)">Prev</button>
+<button @onclick="@(() => _countClass.Count = Math.Max(0 , _countClass.Count - 1))">Prev</button>
 
 <StateViewWithParameters
     Store="_fromFactoryWithClassParamStateStore"
@@ -44,16 +56,19 @@
 @code {
 
     int _count;
+    (int, string) _countTuple = (0, "");
     CountClass _countClass = new();
     CountRecord _countRecord = new(0);
 
     private readonly StateStore<int, User> _fromFactoryWithIntParamStateStore;
+    private readonly StateStore<(int, string), User> _fromFactoryWithTupleParamStateStore;
     private readonly StateStore<CountRecord, User> _fromFactoryWithRecordParamStateStore;
     private readonly StateStore<CountClass, User> _fromFactoryWithClassParamStateStore;
 
     public StateWithParametersExample(StateStoreFactory stateStoreFactory)
     {
         _fromFactoryWithIntParamStateStore = stateStoreFactory.Create<int, User>(GetUser);
+        _fromFactoryWithTupleParamStateStore = stateStoreFactory.Create<(int, string), User>(x => GetUser(x.Item1));
         _fromFactoryWithRecordParamStateStore = stateStoreFactory.Create<CountRecord, User>(x => GetUser(x.Count));
         _fromFactoryWithClassParamStateStore = stateStoreFactory.Create<CountClass, User>(x => GetUser(x.Count));
     }
