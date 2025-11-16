@@ -47,6 +47,16 @@
     private readonly RenderFragment<LoadingStateViewData>? _renderLoading;
 
     private bool _hasLoadedAtLeastOnce;
+    
+    private static readonly IEqualityComparer<TParameters> DefaultParametersEqualityComparer =
+        EqualityComparer<TParameters>.Create(
+            (a, b) =>
+                (a, b) switch
+                {
+                    (IStructuralEquatable s1, IStructuralEquatable s2) => s1.Equals(s2, StructuralComparisons.StructuralEqualityComparer),
+                    (IEquatable<TParameters> e1, IEquatable<TParameters> e2) => e1.Equals(e2),
+                    _ => false
+                });
 
     public StateViewWithParameters(TimeProvider timeProvider)
     {
@@ -87,24 +97,32 @@
         get;
         set
         {
-            switch (value, field)
+            var comparer = ParametersEqualityComparer ?? DefaultParametersEqualityComparer;
+
+            if (comparer.Equals(value, field)) return;
+
+            field = value;
+
+            if (_hasLoadedAtLeastOnce)
             {
-                case (null, null):
-                case (IStructuralEquatable a, IStructuralEquatable b) when a.Equals(b):
-                case (IEquatable<TParameters> c, IEquatable<TParameters> d) when c.Equals(d):
-                    return;
-                default:
-                    field = value;
-
-                    if (_hasLoadedAtLeastOnce)
-                    {
-                        InvokeAsync(LoadStoreWithStateHandler);
-                    }
-
-                    return;
+                InvokeAsync(LoadStoreWithStateHandler);
             }
         }
     } = default!;
+    
+    /// <summary>
+    /// This overrides the default equality comparer used to determine whether the <see cref="Parameters"/> have changed.
+    /// </summary>
+    /// <remarks>
+    /// The default equality comparer is a custom comparer that caries out the following checks in order:
+    /// <list type="number">
+    /// <item>If <see cref="TParameters"/> implements <see cref="IStructuralEquatable"/>, then return the result of <see cref="IStructuralEquatable.Equals(object, IEqualityComparer)"/> using <see cref="StructuralComparisons.StructuralEqualityComparer"/>.</item>
+    /// <item>If <see cref="TParameters"/> implements <see cref="IEquatable{TParameters}"/>, then return the result of <see cref="IEquatable{TParameters}.Equals(TParameters)"/>.</item>
+    /// <item>Otherwise, the objects are treated as not equal (as it's a reference type and there is no way to know if it has actually changed or not).</item>
+    /// </list>
+    /// </remarks>
+    [Parameter]
+    public IEqualityComparer<TParameters>? ParametersEqualityComparer { get; set; }
 
     /// <summary>
     /// This content is rendered when the store loads successfully.
@@ -174,7 +192,7 @@
 
     [Parameter]
     public Action<StateOptions>? ConfigureOptions { get; set; }
-    
+
     /// <summary>
     /// The length of time before a loading state is considered to have timed out.
     /// </summary>
