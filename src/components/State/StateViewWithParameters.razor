@@ -46,6 +46,8 @@
     private readonly RenderFragment<UnauthorizedStateViewData>? _renderUnauthorized;
     private readonly RenderFragment<LoadingStateViewData>? _renderLoading;
 
+    private bool _hasLoadedAtLeastOnce;
+
     public StateViewWithParameters(TimeProvider timeProvider)
     {
         _timeProvider = timeProvider;
@@ -87,7 +89,12 @@
                     return;
                 default:
                     field = value;
-                    InvokeAsync(LoadStoreWithStateHandler);
+
+                    if (_hasLoadedAtLeastOnce)
+                    {
+                        InvokeAsync(LoadStoreWithStateHandler);
+                    }
+
                     return;
             }
         }
@@ -128,27 +135,28 @@
 
     [Parameter]
     public Action<StateOptions>? ConfigureOptions { get; set; }
-    
+
     [Parameter]
     public TimeSpan Timeout { get; set; }
-    
+
     [Parameter]
     public bool IsDefaultContentDisabled { get; set; }
 
     [Parameter]
     public StateInitialLoadEvent InitialLoadEvent { get; set; } = StateInitialLoadEvent.OnInitialized;
 
-    private IOptions<StateOptions> Options => Store.CreateOptions(
-        x =>
-        {
-            ConfigureOptions?.Invoke(x);
-            x.Timeout = Timeout;
-
-            if (IsDefaultContentDisabled)
+    private IOptions<StateOptions> Options =>
+        Store.CreateOptions(
+            x =>
             {
-                x.DisableDefaultContent();
-            }
-        });
+                ConfigureOptions?.Invoke(x);
+                x.Timeout = Timeout;
+
+                if (IsDefaultContentDisabled)
+                {
+                    x.DisableDefaultContent();
+                }
+            });
 
     protected override void OnInitialized()
     {
@@ -180,6 +188,7 @@
         Store.StateChanged += OnStateChanged;
 
         _ = Store.LoadAsync(Parameters);
+        _hasLoadedAtLeastOnce = true;
 
         return;
 
