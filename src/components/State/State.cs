@@ -10,7 +10,7 @@ public sealed record SuccessState<T>(
     DateTimeOffset LoadedAt,
     TimeSpan LoadedIn) : State;
 
-public sealed record LoadingState(DateTimeOffset LoadingStartedAt, Action<LoadingState>? OnReport = null, double? Progress = null) : State
+public sealed record LoadingState(DateTimeOffset LoadingStartedAt, Action<LoadingState>? OnReport = null, double? Progress = null) : State, IProgressReporter
 {
     public void Report(double progress)
     {
@@ -19,6 +19,8 @@ public sealed record LoadingState(DateTimeOffset LoadingStartedAt, Action<Loadin
         
         OnReport?.Invoke(this with { Progress = progress });
     }
+    
+    public TimeSpan LoadingDuration(DateTimeOffset now) => now - LoadingStartedAt;
 }
 
 public sealed record NotFoundState(DateTimeOffset LoadedAt, TimeSpan LoadedIn) : State;
