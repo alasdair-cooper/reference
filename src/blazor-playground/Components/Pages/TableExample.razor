@@ -7,6 +7,34 @@
 
 @page "/table"
 
+<h1>Table</h1>
+
+<h2>Table</h2>
+
+<Table
+    Store="_tableStore"
+    T="User"
+    IsPagingDisabled="true">
+    <IndexColumn />
+    <Column
+        Title="First Name"
+        Property="x => x.FirstName" />
+    <Column
+        Title="Last Name"
+        Property="x => x.LastName" />
+    <Column
+        Title="Age"
+        Property="x => x.Age" />
+    <Column
+        Title="Gender"
+        Property="x => x.Gender" />
+    <Column
+        Title="Email"
+        Property="x => x.Email" />
+</Table>
+
+<h2>Table (with parameters)</h2>
+
 <Select
     @bind-Value:get="(_sortDirection, _sortBy)"
     @bind-Value:set="x => (_sortDirection, _sortBy) = x"
@@ -26,7 +54,7 @@
 </Select>
 
 <TableWithParameters
-    Store="_store"
+    Store="_tableWithParametersStore"
     Parameters="new TableParameters(_page, _pageSize, _sortDirection, _sortBy)"
     T="User"
     TParameters="TableParameters"
@@ -58,11 +86,20 @@
     private int _pageSize = 10;
     private SortDirection _sortDirection = SortDirection.Ascending;
     private UserSortableField _sortBy = UserSortableField.FirstName;
-    private readonly StateStore<TableParameters, TableData<User>> _store;
+    private readonly StateStore<TableData<User>> _tableStore;
+    private readonly StateStore<TableParameters, TableData<User>> _tableWithParametersStore;
 
     public TableExample(StateStoreFactory stateStoreFactory)
     {
-        _store =
+        _tableStore =
+            stateStoreFactory.Create(
+                () =>
+                {
+                    var users = UserGenerator.Users.Take(10).ToList();
+                    return new TableData<User>(users, users.Count);
+                });
+
+        _tableWithParametersStore =
             stateStoreFactory.Create(
                 (TableParameters @params) =>
                 {
@@ -83,7 +120,7 @@
                     return new TableData<User>(users.Skip((@params.Page - 1) * @params.PageSize).Take(@params.PageSize), users.Count);
                 });
     }
-    
+
     public enum UserSortableField
     {
         FirstName,
