@@ -71,10 +71,16 @@
                 ?? StateDefaults.DefaultContent.Empty;
     }
 
+    /// <summary>
+    /// The state store for loading the state for this view.
+    /// </summary>
     [Parameter]
     [EditorRequired]
     public required StateStore<TParameters, T> Store { get; set; }
 
+    /// <summary>
+    /// The parameters to the store.
+    /// </summary>
     [Parameter]
     public TParameters Parameters
     {
@@ -100,48 +106,90 @@
         }
     } = default!;
 
+    /// <summary>
+    /// This content is rendered when the store loads successfully.
+    /// </summary>
     [Parameter]
     public RenderFragment<SuccessStateViewData<T>>? ChildContent { get; set; }
 
+    /// <summary>
+    /// This content is rendered when the store loads successfully.
+    /// </summary>
     [Parameter]
     public RenderFragment<SuccessStateViewData<T>>? SuccessContent { get; set; }
 
+    /// <summary>
+    /// This content is rendered when the store loads successfully or returned <see langword="null"/>.
+    /// </summary>
     [Parameter]
     public RenderFragment<SuccessOrNotFoundStateViewData<T>>? SuccessOrNotFoundContent { get; set; }
 
+    /// <summary>
+    /// This content is rendered while the store is loading and while being authorized.
+    /// </summary>
     [Parameter]
     public RenderFragment<LoadingStateViewData>? LoadingContent { get; set; }
 
+    /// <summary>
+    /// This content is rendered when the store loading times out.
+    /// </summary>
     [Parameter]
     public RenderFragment<TimedOutStateViewData>? TimedOutContent { get; set; }
 
+    /// <summary>
+    /// This content is rendered when the store throws an exception or an exception was throw while rendering some other content.
+    /// </summary>
     [Parameter]
     public RenderFragment<ErrorStateViewData>? ErrorContent { get; set; }
 
+    /// <summary>
+    /// This content is rendered when the store returns <see langword="null"/>.
+    /// </summary>
     [Parameter]
     public RenderFragment<NotFoundStateViewData>? NotFoundContent { get; set; }
 
+    /// <summary>
+    /// This content is rendered when the user is unauthorized, based on <see cref="Roles"/>, <see cref="Policy"/> and <see cref="Resource"/>.
+    /// </summary>
     [Parameter]
     public RenderFragment<UnauthorizedStateViewData>? UnauthorizedContent { get; set; }
 
+    /// <summary>
+    /// The policy name that determines whether the content can be displayed.
+    /// </summary>
     [Parameter]
     public string? Policy { get; set; }
 
+    /// <summary>
+    /// A comma-delimited list of roles that are allowed to display the content.
+    /// </summary>
     [Parameter]
     public string? Roles { get; set; }
 
+    /// <summary>
+    /// The resource to which access is being controlled.
+    /// </summary>
     [Parameter]
     public object? Resource { get; set; }
 
     [Parameter]
     public Action<StateOptions>? ConfigureOptions { get; set; }
-
+    
+    /// <summary>
+    /// The length of time before a loading state is considered to have timed out.
+    /// </summary>
     [Parameter]
     public TimeSpan Timeout { get; set; }
 
+    /// <summary>
+    /// Disables all default content so that nothing is rendered by default.
+    /// </summary>
     [Parameter]
     public bool IsDefaultContentDisabled { get; set; }
 
+    /// <summary>
+    /// This changes the lifecycle method from which the store is initially loaded.
+    /// </summary>
     [Parameter]
     public StateInitialLoadEvent InitialLoadEvent { get; set; } = StateInitialLoadEvent.OnInitialized;
 
@@ -199,6 +247,12 @@
         }
     }
 
+    /// <summary>
+    /// Gets the current state view data if it is of the specified type.
+    /// </summary>
+    /// <param name="currentViewData">The current view data.</param>
+    /// <typeparam name="TViewData">The view data type.</typeparam>
+    /// <returns></returns>
     public bool TryGetCurrentState<TViewData>([NotNullWhen(true)] out TViewData currentViewData) where TViewData : StateViewData
     {
         if (_state is TViewData viewData)
