@@ -12,7 +12,8 @@ public class StateStore<T> : StateStore<object, T>
         ILogger<StateStore<object, T>> logger,
         TimeProvider timeProvider,
         StateLoader<object, T> factory,
-        Func<StateOptions> buildOptions) : base(logger, timeProvider, factory, buildOptions) { }
+        IOptionsFactory<StateOptions> optionsFactory,
+        Action<StateOptions> configureOptions) : base(logger, timeProvider, factory, optionsFactory, configureOptions) { }
 
     public async Task LoadAsync() => await LoadAsync(new object());
 }
@@ -20,8 +21,8 @@ public class StateStore<T> : StateStore<object, T>
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 public partial class StateStore<TParameters, T>
 {
-    private readonly Func<StateOptions> _buildOptions;
-    private readonly StateOptions _options;
+    private readonly IOptionsFactory<StateOptions> _optionsFactory;
+    private readonly Action<StateOptions>? _configureOptions;
     private readonly ILogger _logger;
     private readonly TimeProvider _timeProvider;
     private readonly StateLoader<TParameters, T> _factory;
@@ -34,13 +35,13 @@ public partial class StateStore<TParameters, T>
         ILogger<StateStore<TParameters, T>> logger,
         TimeProvider timeProvider,
         StateLoader<TParameters, T> factory,
-        Func<StateOptions> buildOptions)
+        IOptionsFactory<StateOptions> optionsFactory,
+        Action<StateOptions>? configureOptions)
     {
         _logger = logger;
         _timeProvider = timeProvider;
-
-        _buildOptions = buildOptions;
-        _options = _buildOptions();
+        _optionsFactory = optionsFactory;
+        _configureOptions = configureOptions;
         _factory = factory;
 
         State = NewLoadingState();
@@ -57,10 +58,14 @@ public partial class StateStore<TParameters, T>
     }
 
     internal LoadingState NewLoadingState() =>
-        _options.IsProgressSupported ? new LoadingState(_timeProvider.GetUtcNow(), x => State = x, 0) : new LoadingState(_timeProvider.GetUtcNow());
+        CreateOptions().Value.IsProgressSupported
+            ? new LoadingState(_timeProvider.GetUtcNow(), x => State = x, 0)
+            : new LoadingState(_timeProvider.GetUtcNow());
 
-    public async Task LoadAsync(TParameters parameters)
+    public async Task LoadAsync(TParameters parameters, Action<StateOptions>? configureOptions = null)
     {
+        var options = CreateOptions(configureOptions);
+
         try
         {
             if (_cts is not null)
@@ -81,7 +86,7 @@ public partial class StateStore<TParameters, T>
 
             State = loadingState;
 
-            _cts = new CancellationTokenSource(_options.Timeout);
+            _cts = new CancellationTokenSource(options.Value.Timeout);
 
             var stopwatch = new Stopwatch();
 
@@ -104,7 +109,7 @@ public partial class StateStore<TParameters, T>
         }
         catch (OperationCanceledException ex)
         {
-            State = new TimedOutState(ex, _options.Timeout);
+            State = new TimedOutState(ex, options.Value.Timeout);
         }
         catch (Exception ex)
         {
@@ -118,11 +123,14 @@ public partial class StateStore<TParameters, T>
         }
     }
 
-    public IOptions<StateOptions> Options(Action<StateOptions>? configureOptions)
+    public IOptions<StateOptions> CreateOptions(Action<StateOptions>? configureOptions = null)
     {
-        var opts = _buildOptions();
+        var opts = _optionsFactory.Create(Options.DefaultName);
+
+        _configureOptions?.Invoke(opts);
         configureOptions?.Invoke(opts);
-        return Microsoft.Extensions.Options.Options.Create(opts);
+
+        return Options.Create(opts);
     }
 
     [LoggerMessage(LogLevel.Trace, "State loaded in {Elapsed}")]

@@ -41,8 +41,8 @@
 <h2>From Factory (<code>localStorage</code> after render)</h2>
 
 <StateView
-    Store="_fromLocalStorageStateStore">
-    @* InitialLoadEvent="StateInitialLoadEvent.OnAfterRender"> *@
+    Store="_fromLocalStorageStateStore"
+    InitialLoadEvent="StateInitialLoadEvent.OnAfterRender">
     @context.Value.ToDisplayString()
 </StateView>
 

@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace AlasdairCooper.Reference.Components.State;
 
-public class StateStoreFactory(IOptions<StateOptions> options, IServiceProvider serviceProvider)
+public class StateStoreFactory(IServiceProvider serviceProvider)
 {
     public StateStore<TParameters, T> Create<TParameters, T>(Func<TParameters, T> factory, Action<StateOptions>? configureOptions = null) =>
         CreateCore<TParameters, T>((@params, _, _) => ValueTask.FromResult(factory(@params)), configureOptions);
@@ -46,21 +45,13 @@ public class StateStoreFactory(IOptions<StateOptions> options, IServiceProvider 
         CreateCore<T>((_, _, _) => ValueTask.FromResult(value), configureOptions);
 
     private StateStore<T> CreateCore<T>(StateLoader<object, T> factory, Action<StateOptions>? configureOptions = null) =>
-        ActivatorUtilities.CreateInstance<StateStore<T>>(serviceProvider, factory, GetOptions(configureOptions));
+        ActivatorUtilities.CreateInstance<StateStore<T>>(serviceProvider, factory, configureOptions ?? (_ => { }));
 
     private StateStore<TParameters, T>
         CreateCore<TParameters, T>(StateLoader<TParameters, T> factory, Action<StateOptions>? configureOptions = null) =>
-        ActivatorUtilities.CreateInstance<StateStore<TParameters, T>>(serviceProvider, factory, GetOptions(configureOptions));
+        ActivatorUtilities.CreateInstance<StateStore<TParameters, T>>(serviceProvider, factory, configureOptions ?? (_ => { }));
 
-    private Func<StateOptions> GetOptions(Action<StateOptions>? configure = null) =>
-        () =>
-        {
-            var opts = new StateOptions { Timeout = options.Value.Timeout };
-            configure?.Invoke(opts);
-            return opts;
-        };
-
-    private Action<StateOptions> EnableProgress(Action<StateOptions>? configure) =>
+    private static Action<StateOptions> EnableProgress(Action<StateOptions>? configure) =>
         x =>
         {
             configure?.Invoke(x);

@@ -3,6 +3,7 @@
 
 @page "/state/error"
 
+
 <h1>Error State</h1>
 
 <h2>From Factory (with error in factory)</h2>
@@ -20,10 +21,12 @@
 
 @code {
 
+#pragma warning disable CS0162
     private readonly RenderFragment _throwingFragment =
         @<span>
             @{ throw new InvalidOperationException("Something went wrong in this component."); }
         </span>;
+#pragma warning restore CS0162
 
     private readonly StateStore<User> _fromFactoryStateStore;
     private readonly StateStore<User> _fromFactoryWithErrorStateStore;

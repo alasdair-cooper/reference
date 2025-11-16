@@ -34,6 +34,22 @@
 
 <button @onclick="@(() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync())">Reload (External)</button>
 
+<h2>From Factory (with inline timeout & no default content)</h2>
+
+<StateView
+    Store="_fromFactoryWithDelayAndTimeoutStateStore"
+    Timeout="TimeSpan.FromSeconds(0.5)"
+    IsDefaultContentDisabled="true">
+    <SuccessContent>
+        @context.Value.ToDisplayString()
+    </SuccessContent>
+    <TimedOutContent>
+        Timed out
+    </TimedOutContent>
+</StateView>
+
+<button @onclick="@(() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync())">Reload (External)</button>
+
 @code {
 
     private readonly StateStore<User> _fromFactoryWithProgress;
@@ -42,22 +58,23 @@
 
     public LoadingStateExample(StateStoreFactory stateStoreFactory)
     {
-        _fromFactoryWithProgress = stateStoreFactory.Create(
-            async (state, ct) =>
-            {
-                const int step = 5;
-                var timeToLoad = TimeSpan.FromSeconds(3);
-                var delayPerStep = timeToLoad / 100 * step;
-
-                foreach (var progress in Enumerable.Range(0, 100 / step).Select(x => (double)x * step / 100))
+        _fromFactoryWithProgress =
+            stateStoreFactory.Create(
+                async (state, ct) =>
                 {
-                    state.Report(progress);
-                    await Task.Delay(delayPerStep, ct);
-                }
-                
-                return GetUser();
-            });
-        
+                    const int step = 5;
+                    var timeToLoad = TimeSpan.FromSeconds(3);
+                    var delayPerStep = timeToLoad / 100 * step;
+
+                    foreach (var progress in Enumerable.Range(0, 100 / step).Select(x => (double)x * step / 100))
+                    {
+                        state.Report(progress);
+                        await Task.Delay(delayPerStep, ct);
+                    }
+
+                    return GetUser();
+                });
+
         _fromFactoryWithDelayStateStore =
             stateStoreFactory.Create(
                 async () =>

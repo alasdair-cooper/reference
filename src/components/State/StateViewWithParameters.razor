@@ -128,11 +128,27 @@
 
     [Parameter]
     public Action<StateOptions>? ConfigureOptions { get; set; }
+    
+    [Parameter]
+    public TimeSpan Timeout { get; set; }
+    
+    [Parameter]
+    public bool IsDefaultContentDisabled { get; set; }
 
     [Parameter]
     public StateInitialLoadEvent InitialLoadEvent { get; set; } = StateInitialLoadEvent.OnInitialized;
 
-    private IOptions<StateOptions> Options => Store.Options(ConfigureOptions);
+    private IOptions<StateOptions> Options => Store.CreateOptions(
+        x =>
+        {
+            ConfigureOptions?.Invoke(x);
+            x.Timeout = Timeout;
+
+            if (IsDefaultContentDisabled)
+            {
+                x.DisableDefaultContent();
+            }
+        });
 
     protected override void OnInitialized()
     {

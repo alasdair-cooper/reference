@@ -11,6 +11,6 @@ public static class Extensions
 
         services.AddSingleton<StateStoreFactory>();
 
-        return services.AddOptionsWithValidateOnStart<StateOptions>();
+        return services.AddOptions<StateOptions>().ValidateOnStart();
     }
 }

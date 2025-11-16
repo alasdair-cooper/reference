@@ -7,7 +7,7 @@
     {
         public static readonly RenderFragment Empty = @<text></text>;
         
-        public static readonly RenderFragment<LoadingStateViewData> Loading = _ => @<span>Loading...</span>;
+        public static readonly RenderFragment<LoadingStateViewData> Loading = _ => @<progress aria-busy="true"></progress>;
 
         public static readonly RenderFragment<TimedOutStateViewData> TimedOut =
             x =>
