@@ -35,4 +35,14 @@
                     AuthorizeData="x.AuthorizeData" />;
     }
 
+    public static class StorageKeys
+    {
+        public const string StateViewLoadTimes = "state-view-loads";
+    }
+
+    public static class StorageLimits
+    {
+        public const int MaxStoredLoadTimesPerKey = 10;
+    }
+
 }

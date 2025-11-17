@@ -217,7 +217,7 @@
     [Parameter]
     public StateInitialLoadEvent InitialLoadEvent { get; set; } = StateInitialLoadEvent.OnAfterRender;
 
-    private IOptions<StateOptions> Options =>
+    public IOptions<StateOptions> Options =>
         Store.CreateOptions(
             x =>
             {

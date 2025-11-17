@@ -1,4 +1,8 @@
-﻿@typeparam T
+﻿@using AlasdairCooper.Reference.Components.Utilities
+
+@typeparam T
+
+@implements IDisposable
 
 @code {
 
@@ -20,12 +24,14 @@
 
     protected override void OnParametersSet()
     {
-        if (Table is null)
-        {
-            throw new InvalidOperationException($"{nameof(Column<>)} must be used within a {nameof(ITable<>)} component.");
-        }
-
+        RequiredCascadingParameterException.ThrowIfNull(Table);
         Table.RegisterColumn(this);
+    }
+
+    public void Dispose()
+    {
+        RequiredCascadingParameterException.ThrowIfNull(Table);
+        Table.DeregisterColumn(this);
     }
 
 }

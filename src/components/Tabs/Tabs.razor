@@ -58,6 +58,14 @@
             StateHasChanged();
         }
     }
+    
+    public void DeregisterTab(Tab tab)
+    {
+        if (_tabs.Remove(tab))
+        {
+            StateHasChanged();
+        }
+    }
 
     private void ChangeTab(int index)
     {

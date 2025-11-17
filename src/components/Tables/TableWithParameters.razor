@@ -112,4 +112,12 @@
         }
     }
 
+    public void DeregisterColumn(Column<T> column)
+    {
+        if (_columns.Remove((column.Ordinal ?? 0, column)))
+        {
+            StateHasChanged();
+        }
+    }
+
 }

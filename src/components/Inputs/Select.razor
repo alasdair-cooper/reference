@@ -71,6 +71,15 @@
 
         StateHasChanged();
     }
+    
+    public void DeregisterOption(Option<T> option)
+    {
+        if (!_options.Remove(option)) return;
+
+        SetSelectedIndexForValue();
+
+        StateHasChanged();
+    }
 
     private void SetSelectedIndexForValue()
     {

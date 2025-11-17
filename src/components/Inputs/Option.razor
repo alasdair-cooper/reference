@@ -1,4 +1,8 @@
-﻿@inherits DefaultComponentBase
+﻿@using AlasdairCooper.Reference.Components.Utilities
+
+@inherits DefaultComponentBase
+
+@implements IDisposable
 
 @typeparam T
 
@@ -9,18 +13,20 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
-    
+
     [CascadingParameter]
     public Select<T>? Select { get; set; }
 
     protected override void OnParametersSet()
     {
-        if (Select is null)
-        {
-            throw new InvalidOperationException($"{nameof(Option<>)} must be used within a {nameof(Select<>)} component.");
-        }
-        
+        RequiredCascadingParameterException.ThrowIfNull(Select);
         Select.RegisterOption(this);
+    }
+
+    public void Dispose()
+    {
+        RequiredCascadingParameterException.ThrowIfNull(Select);
+        Select.DeregisterOption(this);
     }
 
 }

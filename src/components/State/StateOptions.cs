@@ -18,27 +18,37 @@ public class StateOptions
     /// The default content rendered the store is loading and while being authorized
     /// </summary>
     public RenderFragment<LoadingStateViewData>? DefaultLoadingContent { get; set; } = StateDefaults.DefaultContent.Loading;
-    
+
     /// <summary>
     /// The default content rendered when the store loading times out. 
     /// </summary>
     public RenderFragment<TimedOutStateViewData>? DefaultTimedOutContent { get; set; } = StateDefaults.DefaultContent.TimedOut;
-    
+
     /// <summary>
     /// The default content rendered when the user is unauthorized.
     /// </summary>
     public RenderFragment<UnauthorizedStateViewData>? DefaultUnauthorizedContent { get; set; } = StateDefaults.DefaultContent.Unauthorized;
-    
+
     /// <summary>
     /// The default content rendered when the store returns <see langword="null"/>.
     /// </summary>
     public RenderFragment<NotFoundStateViewData>? DefaultNotFoundContent { get; set; } = StateDefaults.DefaultContent.NotFound;
-    
+
+    /// <summary>
+    /// The key for the state view load times in local storage. 
+    /// </summary>
+    public string StateViewLoadTimesStorageKey { get; set; } = StateDefaults.StorageKeys.StateViewLoadTimes;
+
+    /// <summary>
+    /// The maximum number of load times stored per keyed state view.
+    /// </summary>
+    public int MaxStoredLoadTimesPerKey { get; set; } = StateDefaults.StorageLimits.MaxStoredLoadTimesPerKey;
+
     /// <summary>
     /// This enables progress reporting while loading the store. 
     /// </summary>
     /// <remarks>Set automatically when the store supports progress reporting.</remarks>
-    internal bool IsProgressSupported { get; set; } 
+    internal bool IsProgressSupported { get; set; }
 
     /// <summary>
     /// Disables all default content so that nothing is rendered by default.

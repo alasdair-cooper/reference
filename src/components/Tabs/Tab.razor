@@ -1,4 +1,8 @@
-﻿@inherits DefaultComponentBase
+﻿@using AlasdairCooper.Reference.Components.Utilities
+
+@inherits DefaultComponentBase
+
+@implements IDisposable
 
 @code {
 
@@ -16,27 +20,28 @@
 
     [CascadingParameter]
     public Tabs? Tabs { get; set; }
-    
+
     [Parameter]
     public string? HeaderId { get; set; }
-    
+
     [Parameter]
     public string? HeaderClass { get; set; }
-    
+
     [Parameter]
     public string? HeaderStyle { get; set; }
-    
+
     [Parameter]
     public Dictionary<string, object?>? HeaderAdditionalAttributes { get; set; }
 
     protected override void OnParametersSet()
     {
-        if (Tabs is null)
-        {
-            throw new InvalidOperationException($"{nameof(Tab)} must be used within a {nameof(AlasdairCooper.Reference.Components.Tabs.Tabs)} component.");
-        }
-
+        RequiredCascadingParameterException.ThrowIfNull(Tabs);
         Tabs.RegisterTab(this);
     }
 
+    public void Dispose()
+    {
+        RequiredCascadingParameterException.ThrowIfNull(Tabs);
+        Tabs.DeregisterTab(this);
+    }
 }
