@@ -3,6 +3,7 @@ using AlasdairCooper.Reference.BlazorPlayground.Components;
 using AlasdairCooper.Reference.BlazorPlayground.Utilities;
 using AlasdairCooper.Reference.Components.Inputs;
 using AlasdairCooper.Reference.Components.State;
+using AlasdairCooper.Reference.Components.Utilities.BrowserStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents(x => x.Deta
 builder.Services.AddDialogs();
 builder.Services.AddInputs();
 builder.Services.AddState();
+builder.Services.AddBrowserStorageServices();
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorizationBuilder().AddPolicy("test", x => x.RequireRole("test"));

@@ -6,40 +6,46 @@
 @typeparam TParameters
 @typeparam T
 
-<ErrorBoundary>
-    <ChildContent>
-        @if (Policy is not null || Roles is not null || Resource is not null)
-        {
-            <AuthorizeView
-                Policy="@Policy"
-                Roles="@Roles"
-                Resource="@Resource">
-                <Authorized>
-                    @_renderState?.Invoke(_state)
-                </Authorized>
-                <Authorizing>
-                    @_renderLoading?.Invoke(LoadingStateViewData.FromState(Store.NewLoadingState(), _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
-                </Authorizing>
-                <NotAuthorized>
-                    @_renderUnauthorized?.Invoke(new UnauthorizedStateViewData(context.User, Resource, new AuthorizeData(Policy, Roles), _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
-                </NotAuthorized>
-            </AuthorizeView>
-        }
-        else
-        {
-            @_renderState?.Invoke(_state)
-        }
-    </ChildContent>
-    <ErrorContent>
-        @_renderError?.Invoke(new ErrorStateViewData(context, _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
-    </ErrorContent>
-</ErrorBoundary>
+@implements IStateView
+
+@attribute [CascadingTypeParameter(nameof(TParameters))]
+
+<CascadingValue Value="@((IStateView)this)">
+    <ErrorBoundary>
+        <ChildContent>
+            @if (Policy is not null || Roles is not null || Resource is not null)
+            {
+                <AuthorizeView
+                    Policy="@Policy"
+                    Roles="@Roles"
+                    Resource="@Resource">
+                    <Authorized>
+                        @_renderState?.Invoke(State)
+                    </Authorized>
+                    <Authorizing>
+                        @_renderLoading?.Invoke(LoadingStateViewData.FromState(Store.NewLoadingState(), _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
+                    </Authorizing>
+                    <NotAuthorized>
+                        @_renderUnauthorized?.Invoke(new UnauthorizedStateViewData(context.User, Resource, new AuthorizeData(Policy, Roles), _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
+                    </NotAuthorized>
+                </AuthorizeView>
+            }
+            else
+            {
+                @_renderState?.Invoke(State)
+            }
+        </ChildContent>
+        <ErrorContent>
+            @_renderError?.Invoke(new ErrorStateViewData(context, _timeProvider.GetUtcNow(), LoadStoreWithStateHandler))
+        </ErrorContent>
+    </ErrorBoundary>
+</CascadingValue>
 
 @code {
 
     private readonly TimeProvider _timeProvider;
 
-    private StateViewData? _state;
+    private StateViewData? State { get; set; }
 
     private readonly RenderFragment<StateViewData?>? _renderState;
     private readonly RenderFragment<ErrorStateViewData>? _renderError;
@@ -47,7 +53,7 @@
     private readonly RenderFragment<LoadingStateViewData>? _renderLoading;
 
     private bool _hasLoadedAtLeastOnce;
-    
+
     private static readonly IEqualityComparer<TParameters> DefaultParametersEqualityComparer =
         EqualityComparer<TParameters>.Create(
             (a, b) =>
@@ -81,6 +87,8 @@
                 ?? StateDefaults.DefaultContent.Empty;
     }
 
+    public event EventHandler<TimeSpan>? StateLoadedSuccessfully;
+
     /// <summary>
     /// The state store for loading the state for this view.
     /// </summary>
@@ -109,7 +117,7 @@
             }
         }
     } = default!;
-    
+
     /// <summary>
     /// This overrides the default equality comparer used to determine whether the <see cref="Parameters"/> have changed.
     /// </summary>
@@ -226,7 +234,7 @@
 
     protected override void OnInitialized()
     {
-        if (InitialLoadEvent is StateInitialLoadEvent.OnInitialized)
+        if (State is null && InitialLoadEvent is StateInitialLoadEvent.OnInitialized)
         {
             LoadStoreWithStateHandler();
         }
@@ -250,18 +258,29 @@
 
     private void LoadStoreWithStateHandler()
     {
-        Store.StateChanged -= OnStateChanged;
-        Store.StateChanged += OnStateChanged;
+        Store.StateChanged -= UpdateState;
+        Store.StateChanged -= InvokeStateLoadedSuccessfully;
+
+        Store.StateChanged += UpdateState;
+        Store.StateChanged += InvokeStateLoadedSuccessfully;
 
         _ = Store.LoadAsync(Parameters);
         _hasLoadedAtLeastOnce = true;
 
         return;
 
-        void OnStateChanged(object? _, State state)
+        void UpdateState(object? _, State state)
         {
-            _state = StateViewData.FromState<T>(state, _timeProvider.GetUtcNow(), LoadStoreWithStateHandler);
+            State = StateViewData.FromState<T>(state, _timeProvider.GetUtcNow(), LoadStoreWithStateHandler);
             InvokeAsync(StateHasChanged);
+        }
+
+        void InvokeStateLoadedSuccessfully(object? _, State state)
+        {
+            if (state is SuccessState<T> successState)
+            {
+                StateLoadedSuccessfully?.Invoke(this, successState.LoadedIn);
+            }
         }
     }
 
@@ -273,7 +292,7 @@
     /// <returns></returns>
     public bool TryGetCurrentState<TViewData>([NotNullWhen(true)] out TViewData currentViewData) where TViewData : StateViewData
     {
-        if (_state is TViewData viewData)
+        if (State is TViewData viewData)
         {
             currentViewData = viewData;
             return true;

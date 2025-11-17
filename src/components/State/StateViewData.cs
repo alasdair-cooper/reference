@@ -1,11 +1,21 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authorization;
 
 namespace AlasdairCooper.Reference.Components.State;
 
-public abstract record StateViewData(DateTimeOffset RenderedAt, Action Reload)
+[JsonDerivedType(typeof(SuccessStateViewData<>), "success")]
+[JsonDerivedType(typeof(LoadingStateViewData), "loading")]
+[JsonDerivedType(typeof(NotFoundStateViewData), "not-found")]
+[JsonDerivedType(typeof(ErrorStateViewData), "error")]
+[JsonDerivedType(typeof(TimedOutStateViewData), "timed-out")]
+[JsonDerivedType(typeof(UnauthorizedStateViewData), "unauthorized")]
+public abstract record StateViewData(
+    DateTimeOffset RenderedAt,
+    [property: JsonIgnore]
+    Action Reload)
 {
     public static StateViewData FromState<T>(State state, DateTimeOffset now, Action reload) =>
         state switch

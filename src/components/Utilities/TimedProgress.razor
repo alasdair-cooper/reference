@@ -1,0 +1,27 @@
+@inject TimeProvider TimeProvider
+
+<progress value="@_progress"></progress>
+
+@code {
+
+    private double _progress;
+
+    [Parameter]
+    [EditorRequired]
+    public TimeSpan Time { get; set;}
+    
+    [Parameter]
+    public int Increments { get; set; } = 100;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var timer = new PeriodicTimer(Time / Increments, TimeProvider);
+
+        while (await timer.WaitForNextTickAsync())
+        {
+            _progress += (double)1 / Increments;
+            StateHasChanged();
+        }
+    }
+
+}

@@ -132,7 +132,7 @@ public partial class StateStore<TParameters, T>
 
         return Options.Create(opts);
     }
-
+    
     [LoggerMessage(LogLevel.Trace, "State loaded in {Elapsed}")]
     partial void LogStateLoaded(TimeSpan elapsed);
 

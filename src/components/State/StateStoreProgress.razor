@@ -1,0 +1,92 @@
+@using System.Collections.Immutable
+@using AlasdairCooper.Reference.Components.Utilities
+@using AlasdairCooper.Reference.Components.Utilities.BrowserStorage
+
+<StateViewWithParameters
+    Store="_store"
+    Parameters="Key"
+    InitialLoadEvent="StateInitialLoadEvent.OnAfterRender">
+    <SuccessOrNotFoundContent>
+        @if (StateView?.TryGetCurrentState(out LoadingStateViewData loadingState) is true)
+        {
+            if (loadingState.Progress is not null)
+            {
+                <Progress Value="loadingState.Progress"></Progress>
+            }
+            else if (context.Success?.Value is { } expectedLoadTime)
+            {
+                <TimedProgress Time="expectedLoadTime" />
+            }
+            else
+            {
+                <Progress></Progress>
+            }
+        }
+    </SuccessOrNotFoundContent>
+</StateViewWithParameters>
+
+@code {
+
+    private const string StateViewLoadTimesStorageKey = "state-view-loads";
+    private const int MaxStoredLoadTimesPerKey = 10;
+
+    private readonly StateStore<string?, TimeSpan?> _store;
+
+    private readonly LocalStorageService _localStorageService;
+
+    [Parameter]
+    public string? Key { get; set; }
+
+    [CascadingParameter]
+    public IStateView? StateView { get; set; }
+
+    public StateStoreProgress(StateStoreFactory stateStoreFactory, LocalStorageService localStorageService)
+    {
+        _localStorageService = localStorageService;
+
+        _store =
+            stateStoreFactory.Create(
+                async (string? key) =>
+                {
+                    if (key is null)
+                    {
+                        return null;
+                    }
+
+                    var loadTimes = await _localStorageService.GetItemAsync<StateViewLoadTimes>(StateViewLoadTimesStorageKey);
+                    var previousLoadTimes = loadTimes?.KeyedLoadTimes.GetValueOrDefault(key) ?? [];
+
+                    return previousLoadTimes.Any() ? TimeSpan.FromTicks((long)previousLoadTimes.Average()) : (TimeSpan?)null;
+                });
+    }
+
+    protected override void OnInitialized()
+    {
+        if (StateView is not null && Key is not null)
+        {
+            StateView?.StateLoadedSuccessfully +=
+                async (_, loadedIn) =>
+                {
+                    var loadTimes = await _localStorageService.GetItemAsync<StateViewLoadTimes>(StateViewLoadTimesStorageKey) ?? StateViewLoadTimes.Empty;
+
+                    var previousLoadTimes = loadTimes.KeyedLoadTimes.GetValueOrDefault(Key) ?? [];
+                    previousLoadTimes.Enqueue(loadedIn.Ticks);
+
+                    while (previousLoadTimes.Count > MaxStoredLoadTimesPerKey)
+                    {
+                        previousLoadTimes.Dequeue();
+                    }
+
+                    loadTimes = new StateViewLoadTimes(loadTimes.KeyedLoadTimes.SetItem(Key, previousLoadTimes));
+
+                    await _localStorageService.SetItemAsync(StateViewLoadTimesStorageKey, loadTimes);
+                };
+        }
+    }
+
+    public record StateViewLoadTimes(ImmutableDictionary<string, Queue<double>> KeyedLoadTimes)
+    {
+        public static StateViewLoadTimes Empty => new([]);
+    }
+
+}
