@@ -5,17 +5,17 @@
 
 <h1>Loading State</h1>
 
-@* <h2>From Factory (with progress)</h2> *@
-@* *@
-@* <StateView Store="_fromFactoryWithProgress"> *@
-@*     <SuccessContent> *@
-@*         @context.Value.ToDisplayString() *@
-@*         <button @onclick="@context.Reload">Reload</button> *@
-@*     </SuccessContent> *@
-@* </StateView> *@
-@* *@
-@* <button @onclick="@(() => _fromFactoryWithProgress.LoadAsync())">Reload (External)</button> *@
-@* *@
+<h2>From Factory (with progress)</h2>
+
+<StateView Store="_fromFactoryWithProgress">
+    <SuccessContent>
+        @context.Value.ToDisplayString()
+        <button @onclick="@context.Reload">Reload</button>
+    </SuccessContent>
+</StateView>
+
+<button @onclick="@(() => _fromFactoryWithProgress.LoadAsync())">Reload (External)</button>
+
 <h2>From Factory (with heuristic progress)</h2>
 
 <StateView Store="_fromFactoryWithDelayStateStore">
@@ -28,36 +28,36 @@
     </LoadingContent>
 </StateView>
 
-@* <h2>From Factory (with delay)</h2> *@
-@* *@
-@* <StateView Store="_fromFactoryWithDelayStateStore"> *@
-@*     @context.Value.ToDisplayString() *@
-@*     <button @onclick="@context.Reload">Reload</button> *@
-@* </StateView> *@
+<h2>From Factory (with delay)</h2>
 
-@* <h2>From Factory (with delay & timeout)</h2> *@
-@* *@
-@* <StateView Store="_fromFactoryWithDelayAndTimeoutStateStore"> *@
-@*     @context.Value.ToDisplayString() *@
-@* </StateView> *@
-@* *@
-@* <button @onclick="@(() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync())">Reload (External)</button> *@
-@* *@
-@* <h2>From Factory (with inline timeout & no default content)</h2> *@
-@* *@
-@* <StateView *@
-@*     Store="_fromFactoryWithDelayAndTimeoutStateStore" *@
-@*     Timeout="TimeSpan.FromSeconds(0.5)" *@
-@*     IsDefaultContentDisabled="true"> *@
-@*     <SuccessContent> *@
-@*         @context.Value.ToDisplayString() *@
-@*     </SuccessContent> *@
-@*     <TimedOutContent> *@
-@*         Timed out *@
-@*     </TimedOutContent> *@
-@* </StateView> *@
-@* *@
-@* <button @onclick="@(() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync())">Reload (External)</button> *@
+<StateView Store="_fromFactoryWithDelayStateStore">
+    @context.Value.ToDisplayString()
+    <button @onclick="@context.Reload">Reload</button>
+</StateView>
+
+<h2>From Factory (with delay & timeout)</h2>
+
+<StateView Store="_fromFactoryWithDelayAndTimeoutStateStore">
+    @context.Value.ToDisplayString()
+</StateView>
+
+<button @onclick="@(() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync())">Reload (External)</button>
+
+<h2>From Factory (with inline timeout & no default content)</h2>
+
+<StateView
+    Store="_fromFactoryWithDelayAndTimeoutStateStore"
+    Timeout="TimeSpan.FromSeconds(0.5)"
+    IsDefaultContentDisabled="true">
+    <SuccessContent>
+        @context.Value.ToDisplayString()
+    </SuccessContent>
+    <TimedOutContent>
+        Timed out
+    </TimedOutContent>
+</StateView>
+
+<button @onclick="@(() => _fromFactoryWithDelayAndTimeoutStateStore.LoadAsync())">Reload (External)</button>
 
 @code {
 
