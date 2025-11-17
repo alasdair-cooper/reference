@@ -6,12 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AlasdairCooper.Reference.Components.State;
 
-[JsonDerivedType(typeof(SuccessStateViewData<>), "success")]
-[JsonDerivedType(typeof(LoadingStateViewData), "loading")]
-[JsonDerivedType(typeof(NotFoundStateViewData), "not-found")]
-[JsonDerivedType(typeof(ErrorStateViewData), "error")]
-[JsonDerivedType(typeof(TimedOutStateViewData), "timed-out")]
-[JsonDerivedType(typeof(UnauthorizedStateViewData), "unauthorized")]
 public abstract record StateViewData(
     DateTimeOffset RenderedAt,
     [property: JsonIgnore]

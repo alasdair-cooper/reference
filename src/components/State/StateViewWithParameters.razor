@@ -8,8 +8,6 @@
 
 @implements IStateView
 
-@attribute [CascadingTypeParameter(nameof(TParameters))]
-
 <CascadingValue Value="@((IStateView)this)">
     <ErrorBoundary>
         <ChildContent>
@@ -217,7 +215,7 @@
     /// This changes the lifecycle method from which the store is initially loaded.
     /// </summary>
     [Parameter]
-    public StateInitialLoadEvent InitialLoadEvent { get; set; } = StateInitialLoadEvent.OnInitialized;
+    public StateInitialLoadEvent InitialLoadEvent { get; set; } = StateInitialLoadEvent.OnAfterRender;
 
     private IOptions<StateOptions> Options =>
         Store.CreateOptions(
