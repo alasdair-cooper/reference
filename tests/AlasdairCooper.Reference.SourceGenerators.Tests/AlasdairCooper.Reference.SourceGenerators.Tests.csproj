@@ -1,0 +1,25 @@
+﻿<Project Sdk="MSTest.Sdk/3.3.1">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\source-generators\AlasdairCooper.Reference.SourceGenerators.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Basic.Reference.Assemblies.Net100" Version="1.8.3" />
+      <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.2" />
+      <PackageReference Include="Microsoft.CodeAnalysis.Testing.Verifiers.MSTest" Version="1.1.2" />
+    </ItemGroup>
+
+</Project>
