@@ -1,0 +1,44 @@
+@typeparam T
+
+@ChildContent(_debouncedValue)
+
+@code {
+
+    private bool _hasLoaded;
+    private CancellationTokenSource _debounceCts = new();
+    private T _debouncedValue = default!;
+
+    [Parameter]
+    [EditorRequired]
+    public T Value { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment<T> ChildContent { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public TimeSpan DebounceInterval { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await _debounceCts.CancelAsync();
+        _debounceCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(DebounceInterval, _debounceCts.Token);
+            _debounceCts.Token.ThrowIfCancellationRequested();
+            _debouncedValue = Value;
+            _hasLoaded = true;
+            StateHasChanged();
+        }
+        catch (OperationCanceledException)
+        {
+            // Ignore
+        }
+    }
+
+    protected override bool ShouldRender() => _hasLoaded;
+    
+}
