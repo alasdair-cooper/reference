@@ -1,0 +1,45 @@
+@typeparam T
+
+@ParentContent(new RecurseParentContentContext(_renderParentContent((this, ActualRoots))))
+
+@code {
+
+    private IEnumerable<T> ActualRoots => Roots ?? (Root is not null ? [Root] : []);
+
+    private readonly RenderFragment<(Recurse<T> component, IEnumerable<T> children)> _renderParentContent =
+        static x =>
+            @<text>
+                 @foreach (var child in x.children)
+                 {
+                     @x.component.ChildContent(new RecurseChildContentContext<T>(child, x.component.ChildrenSelector(child)?.ToList() is { Count: > 0 } children ? x.component._renderChildContent((x.component, children)) : null))
+                 }
+    </text>;
+
+    private readonly RenderFragment<(Recurse<T> component, IEnumerable<T> children)> _renderChildContent =
+        static x =>
+            @<Recurse
+                T="T"
+                Roots="x.children"
+                ChildrenSelector="x.component.ChildrenSelector"
+                ChildContent="x.component.ChildContent"
+                ParentContent="x.component.ParentContent" />;
+
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment<RecurseParentContentContext> ParentContent { get; set; }
+
+    [Parameter]
+    public T? Root { get; set; }
+
+    [Parameter]
+    public IEnumerable<T>? Roots { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment<RecurseChildContentContext<T>> ChildContent { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public Func<T, IEnumerable<T>?> ChildrenSelector { get; set; }
+
+}
