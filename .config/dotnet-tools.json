@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "dotnet-ef": {
-      "version": "9.0.7",
+      "version": "11.0.0-rc.1.26425.128",
       "commands": [
         "dotnet-ef"
       ],
@@ -17,7 +17,7 @@
       "rollForward": false
     },
     "aspire.cli": {
-      "version": "9.4.1",
+      "version": "13.0.0",
       "commands": [
         "aspire"
       ],
