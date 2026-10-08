@@ -9,15 +9,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Humanizer" Version="2.14.1" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
-        <PackageReference Include="PolySharp" Version="1.15.0">
+        <PackageReference Include="Humanizer" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+        <PackageReference Include="PolySharp">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Net.Http.Json" Version="11.0.0-rc.1.26425.128" />
-        <PackageReference Include="System.Text.Json" Version="11.0.0-rc.1.26425.128" />
+        <PackageReference Include="System.Net.Http.Json" />
+        <PackageReference Include="System.Text.Json" />
     </ItemGroup>
 
 </Project>

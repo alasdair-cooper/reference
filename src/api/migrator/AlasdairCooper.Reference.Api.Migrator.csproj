@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="[13.0.2]" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="[11.0.0-rc.1.26425.128]">
+        <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>

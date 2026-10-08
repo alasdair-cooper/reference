@@ -12,11 +12,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.0" />
-        <PackageReference Include="Aspire.Hosting.Garnet" Version="13.0.0" />
-        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.0.0" />
-        <PackageReference Include="Aspire.Hosting.Redis" Version="13.0.0" />
-        <PackageReference Include="Aspire4Wasm.AppHost" Version="6.0.0" />
+        <PackageReference Include="Aspire.Hosting.AppHost" />
+        <PackageReference Include="Aspire.Hosting.Garnet" />
+        <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+        <PackageReference Include="Aspire.Hosting.Redis" />
+        <PackageReference Include="Aspire4Wasm.AppHost" />
     </ItemGroup>
 
     <ItemGroup>

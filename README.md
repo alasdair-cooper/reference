@@ -30,15 +30,20 @@ Do not run this against EF Core 12 main.
 From `lib/efcore`, bootstrap its pinned SDK and build shipping packages:
 
 ```sh
-./restore.sh
+./restore.sh /p:RestoreConfigFile="$PWD/NuGet.config"
 . ./activate.sh
 ./build.sh --configuration Release --pack \
+  /p:RestoreConfigFile="$PWD/NuGet.config" \
   /p:PackageVersion=11.0.0-rc.1.26425.128 \
   /p:Version=11.0.0-rc.1.26425.128
 ```
 
 On Windows, use `restore.cmd`, `. .\activate.ps1`, and `build.cmd` with the
-same configuration, packing, and MSBuild arguments. Verify the packages in
+same configuration, packing, and MSBuild arguments, using
+`/p:RestoreConfigFile="$PWD\NuGet.config"` in PowerShell.
+Explicitly selecting the fork's NuGet config prevents it from inheriting the
+application's package source mappings; this does not bypass the application's
+local EF feed when restoring the reference solution. Verify the packages in
 `lib/efcore/artifacts/packages/Release/Shipping` include Core, Abstractions,
 Relational, Design and `dotnet-ef` at exactly the required version, with their
 EF dependencies also at that version. The EF bootstrap SDK applies only inside

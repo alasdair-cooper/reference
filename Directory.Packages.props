@@ -1,0 +1,49 @@
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.0.0" />
+        <PackageVersion Include="Aspire.Hosting.Garnet" Version="13.0.0" />
+        <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.0.0" />
+        <PackageVersion Include="Aspire.Hosting.Redis" Version="13.0.0" />
+        <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="[13.0.2]" />
+        <PackageVersion Include="Aspire.StackExchange.Redis.DistributedCaching" Version="13.0.0" />
+        <PackageVersion Include="Aspire.StackExchange.Redis.OutputCaching" Version="13.0.0" />
+        <PackageVersion Include="Aspire4Wasm.AppHost" Version="6.0.0" />
+        <PackageVersion Include="Aspire4Wasm.WebApi" Version="6.0.1" />
+        <PackageVersion Include="Aspire4Wasm.WebAssembly" Version="6.0.1" />
+        <PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.3" />
+        <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageVersion Include="Humanizer" Version="2.14.1" />
+        <PackageVersion Include="Humanizer.Core" Version="2.14.1" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.2" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.Testing.Verifiers.MSTest" Version="1.1.2" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="[11.0.0-rc.1.26425.128]" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="[11.0.0-rc.1.26425.128]" />
+        <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.JSInterop" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="[11.0.0-rc.1.1]" />
+        <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
+        <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
+        <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
+        <PackageVersion Include="PolySharp" Version="1.15.0" />
+        <PackageVersion Include="Scalar.AspNetCore.Microsoft" Version="2.10.3" />
+        <PackageVersion Include="System.Memory.Data" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="System.Net.Http.Json" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="System.Text.Json" Version="11.0.0-rc.1.26425.128" />
+        <PackageVersion Include="WaffleGenerator.Bogus" Version="4.2.2" />
+    </ItemGroup>
+</Project>

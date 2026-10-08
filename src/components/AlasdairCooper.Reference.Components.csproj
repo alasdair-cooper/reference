@@ -6,12 +6,12 @@
     </PropertyGroup>
     
     <ItemGroup>
-      <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-      <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="11.0.0-rc.1.26425.128" />
-      <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="11.0.0-rc.1.26425.128" />
-      <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="11.0.0-rc.1.26425.128" />
-      <PackageReference Include="Microsoft.JSInterop" Version="11.0.0-rc.1.26425.128" />
+      <PackageReference Include="Blazored.LocalStorage" />
+      <PackageReference Include="Humanizer.Core" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+      <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
     
     <ItemGroup>
