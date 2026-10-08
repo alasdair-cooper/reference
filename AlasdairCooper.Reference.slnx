@@ -1,0 +1,37 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/items/">
+    <File Path="Directory.build.props" />
+    <File Path="Directory.build.targets" />
+    <File Path="global.json" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/api/">
+    <Project Path="src/api/api/AlasdairCooper.Reference.Api.csproj" />
+    <Project Path="src/api/data/AlasdairCooper.Reference.Api.Data.csproj" />
+    <Project Path="src/api/generator/AlasdairCooper.Reference.Api.Generator.csproj" />
+    <Project Path="src/api/migrator/AlasdairCooper.Reference.Api.Migrator.csproj" />
+  </Folder>
+  <Folder Name="/src/frontend/">
+    <Project Path="src/blazor-playground/AlasdairCooper.Reference.BlazorPlayground.csproj" />
+    <Project Path="src/internal-frontend/AlasdairCooper.Reference.InternalFrontend.csproj" />
+  </Folder>
+  <Folder Name="/src/lib/">
+    <Project Path="src/components/AlasdairCooper.Reference.Components.csproj" />
+    <Project Path="src/shared/AlasdairCooper.Reference.Shared.csproj" />
+    <Project Path="src/source-generators/AlasdairCooper.Reference.SourceGenerators.csproj" />
+  </Folder>
+  <Folder Name="/src/orchestration/">
+    <Project Path="src/orchestration/app-host/AlasdairCooper.Reference.Orchestration.AppHost.csproj" />
+    <Project Path="src/orchestration/service-defaults/AlasdairCooper.Reference.Orchestration.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AlasdairCooper.Reference.SourceGenerators.Tests/AlasdairCooper.Reference.SourceGenerators.Tests.csproj" />
+  </Folder>
+</Solution>

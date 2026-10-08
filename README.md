@@ -61,8 +61,8 @@ From the reference root:
 
 ```sh
 export NUGET_PACKAGES="$PWD/artifacts/nuget/packages"
-dotnet restore AlasdairCooper.Reference.sln --configfile nuget.config
-dotnet build AlasdairCooper.Reference.sln --no-restore
+dotnet restore AlasdairCooper.Reference.slnx --configfile nuget.config
+dotnet build AlasdairCooper.Reference.slnx --no-restore
 dotnet test tests/AlasdairCooper.Reference.SourceGenerators.Tests/AlasdairCooper.Reference.SourceGenerators.Tests.csproj --no-restore
 ```
 
