@@ -9,6 +9,19 @@ This consists of an Aspire app hosting an ASP.NET API backend for a Blazor WASM 
 `global.json` pins SDK `11.0.100-rc.1.26425.128`. Application and test projects
 target `net11.0`; the source generator remains `netstandard2.0`.
 
+With that SDK and Git installed, initialize the repository on Unix or Windows:
+
+```sh
+dotnet fsi init.fsx
+```
+
+`init.fsx` uses Fun.Build to check out the recorded EF Core submodule commit, bootstrap and build
+its Release packages, verifies their versions, restores the solution, installs
+the patched EF CLI in `artifacts/tools`, and builds the solution. It requires Bash on Unix or PowerShell on
+Windows. Each run deletes the application's generated `artifacts` directory after
+building the fork, so stale same-version EF binaries cannot be reused. It does not
+run tests or start the application. The equivalent manual steps are below.
+
 The backend requires the constructor-injection fix in the EF Core fork, ported
 to the **11.0 RC1 source**, not EF Core 12 main with a changed version number.
 Npgsql `11.0.0-rc.1.1` requires exactly EF Core and Relational
